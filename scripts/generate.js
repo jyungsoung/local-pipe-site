@@ -66,6 +66,19 @@ function copyAssets() {
   }
 }
 
+function copyGoogleVerificationFiles() {
+  const files = fs.readdirSync(root).filter((file) => {
+    return file.startsWith("google") && file.endsWith(".html");
+  });
+
+  for (const file of files) {
+    fs.copyFileSync(
+      path.join(root, file),
+      path.join(distDir, file)
+    );
+  }
+}
+
 function makeSitemap(urls) {
   const now = new Date().toISOString();
 
@@ -144,6 +157,7 @@ function build() {
   }
 
   copyAssets();
+  copyGoogleVerificationFiles();
 
   fs.writeFileSync(
     path.join(distDir, "sitemap.xml"),
@@ -165,6 +179,7 @@ function build() {
 
   console.log(`sitemap.xml 생성 완료: ${sitemapUrls.length}개 URL`);
   console.log("robots.txt 생성 완료");
+  console.log("Google verification file 복사 완료");
 }
 
 build();
