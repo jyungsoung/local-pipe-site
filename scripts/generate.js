@@ -132,10 +132,18 @@ function build() {
     }
   }
 
-  const successTemplate = fs.readFileSync(
-    path.join(templatesDir, "success.html"),
-    "utf8"
-  );
+  const indexTemplate = fs.readFileSync(
+  path.join(templatesDir, "index.html"),
+  "utf8"
+);
+
+const indexHtml = replaceCommonText(indexTemplate);
+
+fs.writeFileSync(
+  path.join(distDir, "index.html"),
+  indexHtml,
+  "utf8"
+);
 
   const successHtml = replaceCommonText(successTemplate);
 
