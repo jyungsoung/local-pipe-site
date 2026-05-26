@@ -79,21 +79,34 @@ function copyGoogleVerificationFiles() {
   }
 }
 
+function escapeXml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&apos;");
+}
+
 function makeSitemap(urls) {
   const now = new Date().toISOString();
 
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls
-  .map(
-    (url) => `  <url>
-    <loc>${url}</loc>
+  const xmlUrls = urls
+    .map((url) => {
+      const safeUrl = escapeXml(encodeURI(url));
+
+      return `  <url>
+    <loc>${safeUrl}</loc>
     <lastmod>${now}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
-  </url>`
-  )
-  .join("\n")}
+  </url>`;
+    })
+    .join("\n");
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${xmlUrls}
 </urlset>
 `;
 }
