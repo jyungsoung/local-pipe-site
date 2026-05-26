@@ -1,0 +1,10 @@
+{
+  "name": "local-pipe-site",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/generate.js",
+    "collect:naver": "node scripts/collect-naver-businesses.js"
+  },
+  "dependencies": {}
+}
