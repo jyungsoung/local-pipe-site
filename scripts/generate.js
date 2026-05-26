@@ -1,28 +1,121 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>신청서 접수 완료</title>
-  <meta name="robots" content="noindex,nofollow" />
-</head>
-<body>
-  <main style="max-width:760px; margin:80px auto; padding:30px; text-align:center; font-family:sans-serif;">
-    <div style="width:80px; height:80px; border-radius:50%; background:#111; color:#fff; display:flex; align-items:center; justify-content:center; font-size:40px; margin:0 auto 30px;">✓</div>
-    <h1 id="brand-name">[브랜드명]</h1>
-    <p style="font-size:22px;">신청서 접수가 완료되었습니다.</p>
-    <p style="font-size:18px; color:#666;">빠른 시간 안에 신청하신 지역 담당자를 배정하여 연락드리겠습니다.</p>
-    <p><a href="tel:[전화번호]">바로 전화하기</a></p>
-  </main>
-  <script>
-    const params = new URLSearchParams(location.search);
-    const message = params.get('message');
-    if(message){
-      const title = document.getElementById('brand-name');
-      if(title){
-        title.textContent = `우리동네전문가 | ${message}`;
-      }
+import fs from "node:fs";
+import path from "node:path";
+
+const root = process.cwd();
+
+const areasCsvPath = path.join(root, "data", "areas.csv");
+const servicesPath = path.join(root, "data", "services.json");
+const templatesDir = path.join(root, "templates");
+const distDir = path.join(root, "dist");
+
+const SITE_INFO = {
+  brandName: "우리동네전문가",
+  phone: "1668-1321",
+  email: "kim01057765882@kakao.com"
+};
+
+function readCsv(filePath) {
+  const text = fs.readFileSync(filePath, "utf8").trim();
+  const [headerLine, ...lines] = text.split(/\r?\n/);
+  const headers = headerLine.split(",").map((h) => h.trim());
+
+  return lines.map((line) => {
+    const values = line.split(",").map((v) => v.trim());
+    return Object.fromEntries(headers.map((h, i) => [h, values[i] || ""]));
+  });
+}
+
+function replaceCommonText(template) {
+  return template
+    .replaceAll("[브랜드명]", SITE_INFO.brandName)
+    .replaceAll("[전화번호]", SITE_INFO.phone)
+    .replaceAll("[이메일]", SITE_INFO.email);
+}
+
+function replaceAllText(template, area, service) {
+  return replaceCommonText(template)
+    .replaceAll("[시도명]", area.sido)
+    .replaceAll("[구명]", area.sigungu)
+    .replaceAll("[동명]", area.dong)
+    .replaceAll("[지역슬러그]", area.slug)
+    .replaceAll("[서비스명]", service.name)
+    .replaceAll("[서비스타입]", service.type)
+    .replaceAll("[팜플렛이미지]", `../../assets/${service.pamphlet}`);
+}
+
+function ensureDir(dirPath) {
+  fs.mkdirSync(dirPath, { recursive: true });
+}
+
+function copyAssets() {
+  const src = path.join(root, "assets");
+  const dest = path.join(distDir, "assets");
+
+  if (!fs.existsSync(src)) return;
+
+  ensureDir(dest);
+
+  for (const file of fs.readdirSync(src)) {
+    const srcFile = path.join(src, file);
+    const destFile = path.join(dest, file);
+
+    if (fs.statSync(srcFile).isFile()) {
+      fs.copyFileSync(srcFile, destFile);
     }
-  </script>
-</body>
-</html>
+  }
+}
+
+function build() {
+  fs.rmSync(distDir, { recursive: true, force: true });
+  ensureDir(distDir);
+
+  const areas = readCsv(areasCsvPath);
+  const services = JSON.parse(fs.readFileSync(servicesPath, "utf8"));
+
+  for (const service of services) {
+    const templatePath = path.join(templatesDir, service.template);
+    const template = fs.readFileSync(templatePath, "utf8");
+
+    for (const area of areas) {
+      const html = replaceAllText(template, area, service);
+      const outDir = path.join(distDir, service.urlPrefix, area.slug);
+
+      ensureDir(outDir);
+      fs.writeFileSync(path.join(outDir, "index.html"), html, "utf8");
+    }
+  }
+
+  const successTemplate = fs.readFileSync(
+    path.join(templatesDir, "success.html"),
+    "utf8"
+  );
+
+  const successHtml = replaceCommonText(successTemplate);
+
+  const successDir = path.join(distDir, "success");
+  ensureDir(successDir);
+  fs.writeFileSync(path.join(successDir, "index.html"), successHtml, "utf8");
+
+  const formsDetectPath = path.join(templatesDir, "forms-detect.html");
+
+  if (fs.existsSync(formsDetectPath)) {
+    const formsDetectTemplate = fs.readFileSync(formsDetectPath, "utf8");
+    const formsDetectHtml = replaceCommonText(formsDetectTemplate);
+
+    fs.writeFileSync(
+      path.join(distDir, "forms-detect.html"),
+      formsDetectHtml,
+      "utf8"
+    );
+  }
+
+  copyAssets();
+
+  console.log(
+    `생성 완료: 지역 ${areas.length}개 × 서비스 ${services.length}개 = ${
+      areas.length * services.length
+    }페이지`
+  );
+}
+
+build();
