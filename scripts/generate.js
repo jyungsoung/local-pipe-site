@@ -132,24 +132,34 @@ function build() {
     }
   }
 
-  const indexTemplate = fs.readFileSync(
-  path.join(templatesDir, "index.html"),
-  "utf8"
-);
+  const indexPath = path.join(templatesDir, "index.html");
 
-const indexHtml = replaceCommonText(indexTemplate);
+  if (fs.existsSync(indexPath)) {
+    const indexTemplate = fs.readFileSync(indexPath, "utf8");
+    const indexHtml = replaceCommonText(indexTemplate);
 
-fs.writeFileSync(
-  path.join(distDir, "index.html"),
-  indexHtml,
-  "utf8"
-);
+    fs.writeFileSync(
+      path.join(distDir, "index.html"),
+      indexHtml,
+      "utf8"
+    );
+  }
+
+  const successTemplate = fs.readFileSync(
+    path.join(templatesDir, "success.html"),
+    "utf8"
+  );
 
   const successHtml = replaceCommonText(successTemplate);
 
   const successDir = path.join(distDir, "success");
   ensureDir(successDir);
-  fs.writeFileSync(path.join(successDir, "index.html"), successHtml, "utf8");
+
+  fs.writeFileSync(
+    path.join(successDir, "index.html"),
+    successHtml,
+    "utf8"
+  );
 
   const formsDetectPath = path.join(templatesDir, "forms-detect.html");
 
