@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>경기도 하남시 신장동 하수구막힘 바로출동 상담업체 안내</title>
+  <meta name="description" content="경기도 하남시 신장동 인근에서 하수구막힘, 변기막힘, 싱크대막힘, 배수구 역류 문제가 생겼을 때 빠르게 상담할 수 있는 지역 상담업체 안내 페이지입니다." />
+  
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", Arial, sans-serif;
+    background: #f5f6f7;
+    color: #222;
+    line-height: 1.55;
+  }
+  a { color: inherit; text-decoration: none; }
+  .wrap {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px 16px 82px;
+    background: #fff;
+    min-height: 100vh;
+  }
+  .page-head { margin-bottom: 18px; }
+  .page-head h1 {
+    margin: 0 0 8px;
+    font-size: 26px;
+    line-height: 1.3;
+    letter-spacing: -0.8px;
+    font-weight: 900;
+    color: #202124;
+  }
+  .page-head p {
+    margin: 0 0 16px;
+    font-size: 14px;
+    color: #5f6368;
+  }
+  .chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 10px;
+    border-radius: 7px;
+    background: #f1f3f4;
+    font-size: 12px;
+    font-weight: 700;
+    color: #3c4043;
+  }
+  .chip.hot { background: #e6f4ea; color: #137333; }
+  .chip.blue { background: #eef6ff; color: #0b57d0; }
+  .cta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 18px 0 10px;
+  }
+  .cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    border-radius: 7px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 900;
+    text-align: center;
+    padding: 10px;
+  }
+  .cta.blue { background: #1bb8d4; }
+  .cta.green { background: #147d43; }
+  .call-box {
+    display: block;
+    margin: 10px 0 14px;
+    padding: 13px 14px;
+    border-radius: 8px;
+    background: #df2d42;
+    color: #fff;
+    text-align: center;
+  }
+  .call-box .small {
+    display: block;
+    font-size: 13px;
+    font-weight: 900;
+    margin-bottom: 3px;
+  }
+  .call-box .phone {
+    display: block;
+    font-size: 30px;
+    line-height: 1.1;
+    font-weight: 950;
+    letter-spacing: 0.3px;
+  }
+  .call-box .desc {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    opacity: 0.95;
+  }
+  .pamphlet-box {
+    margin: 14px 0;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e5e8eb;
+    background: #fff;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+  }
+  .pamphlet-head {
+    padding: 12px 14px;
+    background: #f8f9fb;
+    border-bottom: 1px solid #e5e8eb;
+    font-size: 14px;
+    font-weight: 900;
+    color: #202124;
+  }
+  .pamphlet-image {
+    width: 100%;
+    min-height: 260px;
+    background: #eef1f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #7b8794;
+    text-align: center;
+    font-size: 13px;
+    padding: 20px;
+  }
+  .pamphlet-image img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .pamphlet-caption {
+    padding: 11px 14px;
+    color: #5f6368;
+    font-size: 13px;
+    background: #fff;
+  }
+  .top-form {
+    margin: 14px 0 16px;
+    border: 1px solid #e5e8eb;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.035);
+  }
+  .form-head {
+    background: #0b57d0;
+    color: #fff;
+    padding: 17px 16px;
+    text-align: center;
+  }
+  .form-head h2 {
+    margin: 0 0 6px;
+    font-size: 20px;
+    font-weight: 900;
+  }
+  .form-head p {
+    margin: 0;
+    font-size: 13px;
+    opacity: .95;
+  }
+  .form-body { padding: 16px; }
+  .field { margin-bottom: 12px; }
+  .field label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 900;
+  }
+  .input, .textarea {
+    width: 100%;
+    border: 1px solid #d9e0e8;
+    border-radius: 7px;
+    padding: 12px;
+    font-size: 14px;
+    font-family: inherit;
+  }
+  .textarea { min-height: 90px; resize: vertical; }
+  .agree {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    margin: 12px 0 14px;
+    font-size: 12px;
+    color: #555;
+  }
+  .submit {
+    width: 100%;
+    height: 48px;
+    border: 0;
+    border-radius: 7px;
+    background: #ff6b00;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 900;
+    cursor: pointer;
+  }
+  .notice {
+    margin: 10px 0 20px;
+    padding: 15px 14px;
+    border-radius: 7px;
+    background: #68727b;
+    color: #fff;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .summary-box {
+    margin: 18px 0;
+    padding: 17px 16px;
+    border: 1px solid #e5e8eb;
+    border-radius: 12px;
+    background: #fff;
+  }
+  .summary-box h2 {
+    margin: 0 0 9px;
+    font-size: 20px;
+    line-height: 1.35;
+    letter-spacing: -0.5px;
+  }
+  .summary-box p {
+    margin: 0 0 8px;
+    color: #444;
+    font-size: 14px;
+  }
+  .summary-box .standard {
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    background: #f8f9fa;
+    color: #555;
+    font-size: 13px;
+  }
+  .ad-slot {
+    margin: 20px 0;
+    min-height: 96px;
+    border: 1px dashed #c8d1dc;
+    border-radius: 12px;
+    background: #f8fafc;
+    color: #7b8794;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 14px;
+    font-size: 12px;
+  }
+  .ad-slot.large { min-height: 250px; }
+  .ad-slot span {
+    display: block;
+    margin-bottom: 4px;
+    color: #9aa4af;
+    font-size: 10px;
+    letter-spacing: .5px;
+  }
+  .section-title {
+    margin: 28px 0 14px;
+    font-size: 21px;
+    line-height: 1.35;
+    letter-spacing: -0.5px;
+    font-weight: 900;
+    color: #202124;
+  }
+  .company-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .company-card {
+    border: 1px solid #e5e8eb;
+    border-radius: 12px;
+    background: #fff;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.025);
+  }
+  .company-card.featured {
+    border: 2px solid #df2d42;
+    background: #fffafa;
+  }
+  .company-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .rank {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #0b57d0;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 900;
+  }
+  .company-card.featured .rank {
+    width: auto;
+    padding: 0 10px;
+    border-radius: 999px;
+    background: #df2d42;
+    font-size: 12px;
+  }
+  .company-name { flex: 1; }
+  .company-name h3 {
+    margin: 0 0 4px;
+    font-size: 18px;
+    line-height: 1.35;
+    letter-spacing: -0.4px;
+    font-weight: 900;
+  }
+  .category {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: #eef6ff;
+    color: #0b57d0;
+    font-size: 12px;
+    font-weight: 800;
+  }
+  .company-card.featured .category {
+    background: #ffe8e8;
+    color: #c52236;
+  }
+  .company-info {
+    margin-top: 12px;
+    font-size: 14px;
+    color: #444;
+  }
+  .company-info p { margin: 5px 0; }
+  .map-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .map-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    border-radius: 7px;
+    background: #f1f3f4;
+    color: #333;
+    font-size: 13px;
+    font-weight: 800;
+  }
+  .map-btn.primary { background: #0b57d0; color: #fff; }
+  .company-card.featured .map-btn.primary { background: #df2d42; }
+  .faq {
+    margin-top: 12px;
+    border-top: 1px solid #e5e8eb;
+  }
+  details {
+    border-bottom: 1px solid #e5e8eb;
+    padding: 15px 0;
+  }
+  summary {
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 900;
+    list-style: none;
+  }
+  summary::-webkit-details-marker { display: none; }
+  details p {
+    margin: 10px 0 0;
+    color: #555;
+    font-size: 14px;
+  }
+  .footer {
+    margin-top: 26px;
+    padding: 22px 0 0;
+    border-top: 1px solid #e5e8eb;
+    color: #777;
+    font-size: 12px;
+  }
+  .fixed-bar {
+    position: fixed;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 900px;
+    padding: 9px 12px;
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 8px;
+    background: rgba(255,255,255,.96);
+    border-top: 1px solid #e5e8eb;
+    z-index: 50;
+  }
+  .fixed-bar a {
+    min-height: 46px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 900;
+  }
+  .fixed-bar .gray { background: #eef1f4; color: #333; }
+  .fixed-bar .red { background: #df2d42; color: #fff; }
+  @media (max-width: 640px) {
+    .wrap { padding: 16px 12px 82px; }
+    .page-head h1 { font-size: 22px; }
+    .cta-grid, .map-row { grid-template-columns: 1fr; }
+    .call-box .phone { font-size: 25px; }
+    .pamphlet-image { min-height: 220px; }
+  }
+</style>
+
+</head>
+
+<body>
+  <main class="wrap">
+    <header class="page-head">
+      <h1>경기도 하남시 신장동 하수구막힘 바로출동 상담업체 안내</h1>
+      <p>경기도 하남시 신장동 인근에서 하수구막힘, 변기막힘, 싱크대막힘, 배수구 역류 문제가 생겼을 때 빠르게 상담할 수 있는 지역 상담업체 안내 페이지입니다.</p>
+
+      <div class="chip-row">
+        <span class="chip">지역&nbsp; 경기도 하남시 신장동</span>
+        <span class="chip">업종&nbsp; 하수구막힘 · 배관막힘</span>
+        <span class="chip hot">바로출동 상담 가능</span>
+        <span class="chip blue">주변 참고 업체 안내</span>
+      </div>
+
+      <div class="cta-grid">
+        <a class="cta blue" href="#request-form">🛠 하수구/변기/싱크대 온라인 상담신청 &lt;&lt;</a>
+        <a class="cta green" href="tel:1668-1321">📞 하수구막힘 전화 상담 &lt;&lt;</a>
+      </div>
+
+      <a class="call-box" href="tel:1668-1321">
+        <span class="small">📞 하수구막힘 / 변기막힘 / 싱크대막힘 24시 빠른 출동 상담</span>
+        <span class="phone">1668-1321</span>
+        <span class="desc">터치하여 전화연결</span>
+      </a>
+
+      <section class="pamphlet-box" aria-label="하수구막힘 회사 팜플렛">
+        <div class="pamphlet-head">우리동네전문가 하수구막힘 회사 안내 팜플렛</div>
+        <div class="pamphlet-image">
+          <img src="../../assets/hasugu-pamphlet.png" alt="우리동네전문가 하수구막힘 회사 팜플렛" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+          <div style="display:none;">하수구 팜플렛 이미지 영역<br />assets/hasugu-pamphlet.png 파일을 넣으면 표시됩니다.</div>
+        </div>
+        <div class="pamphlet-caption">
+          하수구막힘, 변기막힘, 싱크대막힘, 배관 고압세척, 악취·역류 점검 상담이 가능합니다.
+        </div>
+      </section>
+
+      <section class="top-form" id="request-form">
+        <div class="form-head">
+          <h2>신장동 하수구막힘 상담 신청</h2>
+          <p>이름, 연락처, 증상을 남기면 확인 후 연락드리겠습니다.</p>
+        </div>
+        <div class="form-body">
+          <form name="consult" method="POST" data-netlify="true" action="/success/" onsubmit="const m=encodeURIComponent(this.querySelector('[name=message]').value.trim()); this.action = m ? '/success/?message=' + m : '/success/'; if(location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.protocol === 'file:'){ event.preventDefault(); location.href=this.action; }">
+            <input type="hidden" name="form-name" value="consult" />
+            <input type="hidden" name="service" value="하수구막힘" />
+            <input type="hidden" name="area" value="경기도 하남시 신장동" />
+
+            <div class="field">
+              <label for="name">이름 *</label>
+              <input class="input" id="name" name="name" placeholder="이름을 입력하세요" required />
+            </div>
+
+            <div class="field">
+              <label for="phone">연락처 *</label>
+              <input class="input" id="phone" name="phone" type="tel" placeholder="010-0000-0000" required />
+            </div>
+
+            <div class="field">
+              <label for="address">주소</label>
+              <input class="input" id="address" name="address" value="경기도 하남시 신장동" />
+            </div>
+
+            <div class="field">
+              <label for="message">문의사항</label>
+              <textarea class="textarea" id="message" name="message" placeholder="예: 하수구 물이 역류하고 악취가 납니다."></textarea>
+            </div>
+
+            <label class="agree">
+              <input type="checkbox" required checked />
+              <span>개인정보 수집 및 이용에 동의합니다. 상담 목적 외에는 사용하지 않습니다.</span>
+            </label>
+
+            <button class="submit" type="submit">신청하기</button>
+          </form>
+        </div>
+      </section>
+
+      <div class="notice">
+        긴급 서비스 / 견적요청은 전화연결<br />
+        자세한 상태를 문자 또는 온라인 상담을 통해 남겨주시면 빠른 상담이 가능합니다.
+      </div>
+    </header>
+
+    <section class="summary-box">
+      <h2>경기도 하남시 신장동 하수구막힘 상담이 필요하다면</h2>
+      <p>신장동 일대에서 하수구막힘, 변기막힘, 싱크대막힘, 배수구 역류 증상이 발생했을 때 빠르게 상담할 수 있는 업체 정보와 주변 참고 업체 정보를 함께 정리했습니다.</p>
+      <div class="standard">안내 기준: 하수구막힘 / 배관막힘 / 변기막힘 / 싱크대막힘 / 배수구 역류 관련 상담 가능 업체</div>
+    </section>
+
+    <div class="ad-slot" id="ad-top">
+      <div><span>ADVERTISEMENT</span>상단 광고 영역<br />애드센스, 지역 제휴 배너, 전화상담 배너 코드를 이 위치에 넣으세요.</div>
+    </div>
+
+    <h2 class="section-title">신장동 하수구막힘 바로출동 상담 가능 업체</h2>
+
+    <section class="company-list">
+      <article class="company-card featured">
+        <div class="company-top">
+          <span class="rank">상담 가능</span>
+          <div class="company-name">
+            <h3>우리동네전문가 - 신장동 하수구막힘 바로출동 상담</h3>
+            <span class="category">하수구막힘 · 변기막힘 · 싱크대막힘 · 배관막힘</span>
+          </div>
+        </div>
+        <div class="company-info">
+          <p><strong>상담 가능 지역:</strong> 경기도 하남시 신장동 및 인근 지역</p>
+          <p><strong>주요 서비스:</strong> 하수구막힘, 변기막힘, 싱크대막힘, 배수구 역류, 배관 고압세척 상담</p>
+          <p><strong>상담 방식:</strong> 전화 상담 / 사진 상담 / 현장 출동 상담</p>
+        </div>
+        <div class="map-row">
+          <a class="map-btn primary" href="tel:1668-1321">바로 전화 상담</a>
+          <a class="map-btn" href="#request-form">온라인 상담신청</a>
+        </div>
+      </article>
+    </section>
+
+    <div class="ad-slot large" id="ad-after-featured">
+      <div><span>ADVERTISEMENT</span>중간 광고 영역<br />내 업체 상담 카드 아래, 주변 참고 업체 목록 위에 들어가는 핵심 광고 자리입니다.</div>
+    </div>
+
+    <h2 class="section-title">신장동 인근 하수구·배관 관련 참고 업체</h2>
+
+    <section class="company-list">
+      <article class="company-card">
+        <div class="company-top"><span class="rank">1</span><div class="company-name"><h3>신장동 인근 하수구막힘 참고 업체</h3><span class="category">하수구막힘</span></div></div>
+        <div class="company-info"><p><strong>참고 업종:</strong> 하수구막힘, 배관막힘, 배수구 역류</p><p><strong>표시 기준:</strong> 지역 검색 및 지도 정보 참고</p><p><strong>지역:</strong> 경기도 하남시 신장동 인근</p></div>
+        <div class="map-row"><a class="map-btn primary" href="https://map.naver.com/" target="_blank" rel="nofollow noopener">네이버 지도 확인</a><a class="map-btn" href="https://www.google.com/maps" target="_blank" rel="nofollow noopener">구글 지도 확인</a></div>
+      </article>
+      <article class="company-card">
+        <div class="company-top"><span class="rank">2</span><div class="company-name"><h3>신장동 인근 변기막힘 참고 업체</h3><span class="category">변기막힘</span></div></div>
+        <div class="company-info"><p><strong>참고 업종:</strong> 변기막힘, 변기뚫는곳, 배관수리</p><p><strong>표시 기준:</strong> 지역 검색 및 지도 정보 참고</p><p><strong>지역:</strong> 경기도 하남시 신장동 인근</p></div>
+        <div class="map-row"><a class="map-btn primary" href="https://map.naver.com/" target="_blank" rel="nofollow noopener">네이버 지도 확인</a><a class="map-btn" href="https://www.google.com/maps" target="_blank" rel="nofollow noopener">구글 지도 확인</a></div>
+      </article>
+      <article class="company-card">
+        <div class="company-top"><span class="rank">3</span><div class="company-name"><h3>신장동 인근 싱크대막힘 참고 업체</h3><span class="category">싱크대막힘</span></div></div>
+        <div class="company-info"><p><strong>참고 업종:</strong> 싱크대막힘, 주방배수구, 고압세척</p><p><strong>표시 기준:</strong> 지역 검색 및 지도 정보 참고</p><p><strong>지역:</strong> 경기도 하남시 신장동 인근</p></div>
+        <div class="map-row"><a class="map-btn primary" href="https://map.naver.com/" target="_blank" rel="nofollow noopener">네이버 지도 확인</a><a class="map-btn" href="https://www.google.com/maps" target="_blank" rel="nofollow noopener">구글 지도 확인</a></div>
+      </article>
+    </section>
+
+    <div class="ad-slot large" id="ad-middle">
+      <div><span>ADVERTISEMENT</span>업체 목록 중간 광고 영역<br />300x250 광고, 네이티브 광고, 지역 제휴 배너를 넣기 좋은 위치입니다.</div>
+    </div>
+
+    <h2 class="section-title">FAQ</h2>
+    <section class="faq">
+      <details><summary>아래 업체 목록은 실제 순위인가요?</summary><p>아닙니다. 주변 업체 목록은 지역 검색 및 지도 정보를 참고한 안내용 목록입니다. 실제 출동 가능 여부와 비용은 각 업체 상황에 따라 달라질 수 있습니다.</p></details>
+      <details><summary>신장동에서 하수구막힘 상담을 요청하려면 어떻게 하나요?</summary><p>상단 전화번호를 누르거나 온라인 상담신청을 남기면 됩니다. 증상 사진과 주소를 함께 남기면 상담이 더 빠릅니다.</p></details>
+      <details><summary>하수구 막힘 시 뜨거운 물을 부어도 괜찮을까요?</summary><p>너무 뜨거운 끓는 물은 PVC 배관에 부담을 줄 수 있습니다. 역류가 반복되면 전문 점검을 받는 편이 안전합니다.</p></details>
+    </section>
+
+    <div class="ad-slot" id="ad-bottom">
+      <div><span>ADVERTISEMENT</span>하단 광고 영역<br />관련 업체 광고, 상담 배너, 제휴 링크 삽입 위치입니다.</div>
+    </div>
+
+    <footer class="footer">
+      <p><strong>경기도 하남시 신장동 하수구막힘 상담업체 안내 페이지입니다.</strong></p>
+      <p>본 페이지는 지역 하수구막힘 상담과 주변 참고 업체 정보를 안내하기 위한 정보형 페이지입니다. 실제 출동 가능 여부와 비용은 현장 상황에 따라 달라질 수 있습니다.</p>
+      <p style="margin-top:8px;">우리동네전문가 | 대표번호: 1668-1321 | 사업자정보 영역 | 이메일: kim01057765882@kakao.com</p>
+    </footer>
+  </main>
+
+  <nav class="fixed-bar">
+    <a class="gray" href="#request-form">온라인 상담신청</a>
+    <a class="red" href="tel:1668-1321">바로출동 전화상담</a>
+  </nav>
+</body>
+</html>

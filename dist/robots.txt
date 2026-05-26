@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://preeminent-fenglisu-4251ae.netlify.app/sitemap.xml
