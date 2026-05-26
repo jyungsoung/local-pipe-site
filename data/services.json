@@ -1,0 +1,39 @@
+[
+  {
+    "type": "hasugu",
+    "name": "하수구막힘",
+    "urlPrefix": "hasugu",
+    "template": "hasugu.html",
+    "pamphlet": "hasugu-pamphlet.png",
+    "titlePattern": "[시도명] [구명] [동명] 하수구막힘 바로출동 상담업체 안내",
+    "descriptionPattern": "[시도명] [구명] [동명] 인근에서 하수구막힘, 변기막힘, 싱크대막힘, 배수구 역류 문제가 생겼을 때 빠르게 상담할 수 있는 지역 상담업체 안내 페이지입니다.",
+    "keywords": [
+      "하수구막힘",
+      "하수구뚫는곳",
+      "변기막힘",
+      "싱크대막힘",
+      "배관막힘",
+      "배수구막힘",
+      "하수구역류"
+    ]
+  },
+  {
+    "type": "nusu",
+    "name": "누수탐지",
+    "urlPrefix": "nusu",
+    "template": "nusu.html",
+    "pamphlet": "nusu-pamphlet.png",
+    "titlePattern": "[시도명] [구명] [동명] 누수탐지 바로출동 상담업체 안내",
+    "descriptionPattern": "[시도명] [구명] [동명] 인근에서 천장누수, 욕실누수, 아랫집누수, 미세누수, 배관누수가 의심될 때 빠르게 상담할 수 있는 지역 상담업체 안내 페이지입니다.",
+    "keywords": [
+      "누수탐지",
+      "누수탐지업체",
+      "미세누수탐지",
+      "천장누수",
+      "욕실누수",
+      "아랫집누수",
+      "배관누수",
+      "보일러배관누수"
+    ]
+  }
+]

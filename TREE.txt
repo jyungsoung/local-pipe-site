@@ -1,0 +1,41 @@
+local-pipe-site/
+├─ package.json
+├─ netlify.toml
+├─ README.md
+├─ .gitignore
+│
+├─ data/
+│  ├─ areas.csv
+│  ├─ services.json
+│  └─ businesses/
+│     ├─ hasugu.json
+│     └─ nusu.json
+│
+├─ scripts/
+│  ├─ generate.js
+│  ├─ collect-naver-businesses.js
+│  └─ utils.js
+│
+├─ templates/
+│  ├─ hasugu.html
+│  ├─ nusu.html
+│  └─ success.html
+│
+├─ assets/
+│  ├─ hasugu-pamphlet.png
+│  ├─ nusu-pamphlet.png
+│  └─ placeholder.txt
+│
+├─ dist/
+│  ├─ hasugu/
+│  │  └─ sample-area/
+│  │     └─ index.html
+│  ├─ nusu/
+│  │  └─ sample-area/
+│  │     └─ index.html
+│  └─ success/
+│     └─ index.html
+│
+└─ docs/
+   ├─ 작업순서.md
+   └─ 배포체크리스트.md
