@@ -11,7 +11,8 @@ const distDir = path.join(root, "dist");
 const SITE_INFO = {
   brandName: "우리동네전문가",
   phone: "1668-1321",
-  email: "kim01057765882@kakao.com"
+  email: "kim01057765882@kakao.com",
+  siteUrl: "https://preeminent-fenglisu-4251ae.netlify.app"
 };
 
 function readCsv(filePath) {
@@ -65,12 +66,41 @@ function copyAssets() {
   }
 }
 
+function makeSitemap(urls) {
+  const now = new Date().toISOString();
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls
+  .map(
+    (url) => `  <url>
+    <loc>${url}</loc>
+    <lastmod>${now}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>`
+  )
+  .join("\n")}
+</urlset>
+`;
+}
+
+function makeRobots() {
+  return `User-agent: *
+Allow: /
+
+Sitemap: ${SITE_INFO.siteUrl}/sitemap.xml
+`;
+}
+
 function build() {
   fs.rmSync(distDir, { recursive: true, force: true });
   ensureDir(distDir);
 
   const areas = readCsv(areasCsvPath);
   const services = JSON.parse(fs.readFileSync(servicesPath, "utf8"));
+
+  const sitemapUrls = [];
 
   for (const service of services) {
     const templatePath = path.join(templatesDir, service.template);
@@ -82,6 +112,10 @@ function build() {
 
       ensureDir(outDir);
       fs.writeFileSync(path.join(outDir, "index.html"), html, "utf8");
+
+      sitemapUrls.push(
+        `${SITE_INFO.siteUrl}/${service.urlPrefix}/${area.slug}/`
+      );
     }
   }
 
@@ -111,11 +145,26 @@ function build() {
 
   copyAssets();
 
+  fs.writeFileSync(
+    path.join(distDir, "sitemap.xml"),
+    makeSitemap(sitemapUrls),
+    "utf8"
+  );
+
+  fs.writeFileSync(
+    path.join(distDir, "robots.txt"),
+    makeRobots(),
+    "utf8"
+  );
+
   console.log(
     `생성 완료: 지역 ${areas.length}개 × 서비스 ${services.length}개 = ${
       areas.length * services.length
     }페이지`
   );
+
+  console.log(`sitemap.xml 생성 완료: ${sitemapUrls.length}개 URL`);
+  console.log("robots.txt 생성 완료");
 }
 
 build();
