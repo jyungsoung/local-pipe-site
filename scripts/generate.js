@@ -66,6 +66,14 @@ function copyAssets() {
   }
 }
 
+function copyPublicFiles() {
+  const src = path.join(root, "public");
+
+  if (!fs.existsSync(src)) return;
+
+  fs.cpSync(src, distDir, { recursive: true });
+}
+
 function copyGoogleVerificationFiles() {
   const files = fs.readdirSync(root).filter((file) => {
     return file.startsWith("google") && file.endsWith(".html");
@@ -188,6 +196,7 @@ function build() {
   }
 
   copyAssets();
+  copyPublicFiles();
   copyGoogleVerificationFiles();
 
   fs.writeFileSync(
@@ -211,6 +220,7 @@ function build() {
   console.log(`sitemap.xml 생성 완료: ${sitemapUrls.length}개 URL`);
   console.log("robots.txt 생성 완료");
   console.log("Google verification file 복사 완료");
+  console.log("public 폴더 파일 복사 완료");
 }
 
 build();
