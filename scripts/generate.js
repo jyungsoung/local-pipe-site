@@ -551,7 +551,7 @@ function renderBasePage({ title, description, canonical, body }) {
 function renderHomeIndex(areas) {
   const title = "응급배관119 | 서울·경기·인천 하수구막힘·누수탐지 상담";
   const description =
-    "응급배관119는 서울·경기·인천 하수구막힘, 싱크대막힘, 변기막힘, 배수구역류, 누수탐지, 아래층누수, 난방배관누수 문제를 현장 상황에 맞게 확인합니다. 대표번호 1668-1321";
+    "서울·경기·인천 하수구막힘, 싱크대막힘, 변기막힘, 배수구역류, 누수탐지, 아래층누수, 난방배관누수 문제를 현장 상황에 맞게 확인합니다.";
 
   const body = `
     <section class="hero">
