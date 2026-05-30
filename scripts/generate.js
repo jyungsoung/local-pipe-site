@@ -20,7 +20,7 @@ const CATEGORY_CONTENT = {
     label: "하수",
     title: "서울·경기·인천 하수구막힘, 싱크대막힘·변기막힘 상담 | 응급배관119",
     description:
-      "서울·경기·인천 하수구막힘, 싱크대막힘, 변기막힘, 배수구막힘, 맨홀막힘, 오수관역류 상담. 물이 안 내려가는 모든 하수 문제를 현장 상황에 맞게 확인합니다. 응급배관119 1668-1321",
+      "서울·경기·인천 하수구막힘 상담. 싱크대막힘, 변기막힘, 배수구역류 확인.",
     h1: "서울·경기·인천 하수구막힘 상담",
     subtitle: "물이 안 내려가는 모든 증상을 확인합니다.",
     image: "hasugu-pamphlet.png",
@@ -55,7 +55,7 @@ const CATEGORY_CONTENT = {
     label: "누수",
     title: "서울·경기·인천 누수탐지, 아래층누수·난방배관누수 상담 | 응급배관119",
     description:
-      "서울·경기·인천 누수탐지, 아래층누수, 천장누수, 세탁실누수, 화장실누수, 난방배관누수 상담. 물이 새는 모든 누수 문제를 현장 상황에 맞게 확인합니다. 응급배관119 1668-1321",
+      "서울·경기·인천 누수탐지 상담. 아래층누수, 천장누수, 난방배관누수 확인.",
     h1: "서울·경기·인천 누수탐지 상담",
     subtitle: "물이 새어나오는 모든 증상을 확인합니다.",
     image: "nusu-pamphlet.png",
@@ -187,11 +187,6 @@ function copyGoogleVerificationFiles() {
   }
 }
 
-function makeUrl(pathname) {
-  const cleanPath = pathname.startsWith("/") ? pathname : `/${pathname}`;
-  return `${SITE_INFO.siteUrl}${cleanPath}`;
-}
-
 function getAreaName(area) {
   return [area.sido, area.sigungu, area.dong].filter(Boolean).join(" ");
 }
@@ -236,6 +231,13 @@ function renderBasePage({ title, description, canonical, body }) {
   <title>${escapeHtml(title)}</title>
   <meta name="description" content="${escapeHtml(description)}" />
   <link rel="canonical" href="${escapeHtml(canonical)}" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="${escapeHtml(title)}" />
+  <meta property="og:description" content="${escapeHtml(description)}" />
+  <meta property="og:url" content="${escapeHtml(canonical)}" />
+  <meta property="og:site_name" content="${escapeHtml(SITE_INFO.brandName)}" />
+
   <style>
     :root {
       --blue: #0b5ed7;
@@ -549,9 +551,9 @@ function renderBasePage({ title, description, canonical, body }) {
 }
 
 function renderHomeIndex(areas) {
-  const title = "응급배관119 | 서울·경기·인천 하수구막힘·누수탐지 상담";
+  const title = "24시간 상담가능 | 서울·경기·인천 하수구막힘·누수탐지 상담";
   const description =
-    "서울·경기·인천 하수구막힘, 싱크대막힘, 변기막힘, 배수구역류, 누수탐지, 아래층누수, 난방배관누수 문제를 현장 상황에 맞게 확인합니다.";
+    "서울·경기·인천 하수구막힘·누수탐지 상담. 변기막힘, 싱크대막힘, 아래층누수,누수탐지, 확인.";
 
   const body = `
     <section class="hero">
@@ -750,7 +752,6 @@ function build() {
   copyPublicFiles();
   copyGoogleVerificationFiles();
 
-  // 메인 허브 페이지 생성: dist/index.html
   fs.writeFileSync(
     path.join(distDir, "index.html"),
     renderHomeIndex(areas),
@@ -759,7 +760,6 @@ function build() {
 
   sitemapUrls.push(`${SITE_INFO.siteUrl}/`);
 
-  // 대표 카테고리 페이지 생성: dist/hasugu/index.html, dist/nusu/index.html
   for (const service of services) {
     const prefix = normalizePrefix(service.urlPrefix);
 
@@ -777,7 +777,6 @@ function build() {
     }
   }
 
-  // 지역별 상세 페이지 생성
   for (const service of services) {
     const prefix = normalizePrefix(service.urlPrefix);
     const templatePath = path.join(templatesDir, service.template);
@@ -805,7 +804,6 @@ function build() {
     }
   }
 
-  // 문의 성공 페이지 생성
   const successPath = path.join(templatesDir, "success.html");
 
   if (fs.existsSync(successPath)) {
@@ -818,7 +816,6 @@ function build() {
     fs.writeFileSync(path.join(successDir, "index.html"), successHtml, "utf8");
   }
 
-  // Netlify Forms 감지용 파일 생성
   const formsDetectPath = path.join(templatesDir, "forms-detect.html");
 
   if (fs.existsSync(formsDetectPath)) {
@@ -832,7 +829,6 @@ function build() {
     );
   }
 
-  // sitemap, robots는 마지막에 생성해서 public 파일보다 우선 적용
   fs.writeFileSync(
     path.join(distDir, "sitemap.xml"),
     makeSitemap(sitemapUrls),
