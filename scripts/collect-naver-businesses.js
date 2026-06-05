@@ -36,15 +36,21 @@ async function searchNaverLocal(query) {
   const res = await fetch(url, {
     headers: {
       "X-Naver-Client-Id": NAVER_CLIENT_ID,
-      "X-Naver-Client-Secret": NAVER_CLIENT_SECRET
+      "X-Naver-Client-Secret": NAVER_CLIENT_SECRET,
+      "Accept": "application/json"
     }
   });
 
   if (!res.ok) {
-    throw new Error(`Naver API Error: ${res.status}`);
+    const bodyText = await res.text();
+    throw new Error(`Naver API Error ${res.status}: ${bodyText}`);
   }
 
-  return res.json();
+  try {
+    return await res.json();
+  } catch (error) {
+    throw new Error(`Naver API JSON parse error: ${error.message}`);
+  }
 }
 
 function isNearby(item, area) {
