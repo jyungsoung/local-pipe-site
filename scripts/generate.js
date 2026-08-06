@@ -20,13 +20,30 @@ const SITE_INFO = {
 };
 
 const WORK_IMAGES = [
-  { file: "work-kitchen-sink.jpg", hasugu: "싱크대 배관 막힘 제거 작업", nusu: "싱크대 하부 배관 점검 작업" },
-  { file: "work-toilet-drain.jpg", hasugu: "변기 막힘 제거 작업", nusu: "욕실 배관 상태 점검 작업" },
-  { file: "work-high-pressure-jet.jpg", hasugu: "하수관 고압세척 작업", nusu: "외부 배관 점검 작업" },
-  { file: "work-pipe-camera.jpg", hasugu: "배관 내시경 막힘 원인 확인", nusu: "배관 내시경 누수 원인 확인" },
-  { file: "work-leak-detection.jpg", hasugu: "배관 상태 정밀 진단 작업", nusu: "청음식 누수탐지 작업" },
-  { file: "work-floor-drain.jpg", hasugu: "화장실 바닥 배수구 막힘 제거", nusu: "욕실 배수 배관 점검 작업" }
+  { file: "field-pipe-camera.jpg", hasugu: "배관내시경으로 관 내부를 확인하는 실제 현장", nusu: "배관내시경으로 배관 상태를 확인하는 실제 현장" },
+  { file: "field-obstruction.jpg", hasugu: "배관에서 제거한 이물질을 확인하는 실제 현장", nusu: "배관 주변 이상 원인을 확인하는 실제 현장" },
+  { file: "field-shaft-tool.jpg", hasugu: "샤프트 장비로 배관을 정비하는 실제 현장", nusu: "배관 점검 장비를 준비한 실제 현장" },
+  { file: "field-floor-drain.jpg", hasugu: "욕실 바닥 배수구를 세척하는 실제 현장", nusu: "욕실 배수구와 연결 배관을 확인하는 실제 현장" },
+  { file: "field-toilet-check.jpg", hasugu: "변기 탈거 후 오수 배관을 확인하는 실제 현장", nusu: "욕실 오수 배관 주변을 확인하는 실제 현장" },
+  { file: "field-bathroom-tools.jpg", hasugu: "욕실 배관 작업 장비를 설치한 실제 현장", nusu: "욕실 누수 점검 장비를 준비한 실제 현장" }
 ];
+
+const LOCAL_GUIDE_VARIANTS = {
+  hasugu: {
+    focus: ["싱크대 배수 지연", "변기 물 차오름", "욕실 바닥배수구 역류", "세탁실 배수 불량", "상가 주방 배관 막힘", "맨홀과 오수관 수위 상승"],
+    setting: ["아파트와 공동주택", "다가구·빌라", "오래된 단독주택", "음식점과 소형 상가", "주상복합 건물", "사무실과 근린생활시설"],
+    cause: ["기름과 음식물 찌꺼기의 누적", "물티슈·휴지 등 이물질 유입", "비누때와 머리카락의 결합", "배관 굴곡부의 침전물", "공용배관 쪽 흐름 저하", "배관 노후와 관경 축소"],
+    check: ["배수 속도와 역류 지점을 먼저 확인한 뒤 배관내시경으로 내부 상태를 살핍니다", "한 곳만 막혔는지 여러 배수구가 함께 느린지 확인해 작업 범위를 정합니다", "전동 스프링과 샤프트 장비 적용 가능성을 비교하고 필요한 경우 고압세척을 검토합니다", "배관 길이와 굴곡, 이물질 위치를 확인한 다음 적합한 장비를 선택합니다"],
+    prevention: ["기름은 식힌 뒤 별도로 버리고 거름망을 자주 비우는 것이 좋습니다", "물티슈와 위생용품은 변기에 넣지 않는 것이 재발 방지에 도움이 됩니다", "여러 배수구가 동시에 느려지면 공용배관 문제 여부를 일찍 확인하는 것이 좋습니다", "단순 약품을 반복 사용하기보다 원인 구간을 확인하는 편이 배관 손상을 줄일 수 있습니다"]
+  },
+  nusu: {
+    focus: ["아래층 천장 물자국", "욕실 주변 습기", "보일러 압력 저하", "세탁실 바닥의 반복적인 물 고임", "벽지 변색과 곰팡이", "수도 사용량의 갑작스러운 증가"],
+    setting: ["아파트와 공동주택", "다가구·빌라", "오래된 단독주택", "상가와 사무실", "주상복합 건물", "리모델링을 거친 건물"],
+    cause: ["급수·온수 배관의 미세 누수", "난방배관의 압력 저하", "욕실 방수층 또는 배수 연결부 이상", "외벽과 창호 주변 빗물 유입", "배관 연결부 노후", "결로와 실제 누수의 혼동"],
+    check: ["피해 위치와 물 사용 시점을 확인하고 공압검사와 청음탐지 순서를 정합니다", "계량기 움직임과 배관 압력을 비교해 급수·온수·난방 계통을 구분합니다", "눈에 보이는 물자국만으로 단정하지 않고 가스탐지나 열화상 확인 필요성을 검토합니다", "윗집 설비와 공용부 가능성을 함께 살펴 불필요한 철거를 줄입니다"],
+    prevention: ["물자국의 범위와 발생 시간을 사진으로 남기면 원인 구분에 도움이 됩니다", "보일러 압력을 반복해서 보충하기 전에 난방배관 점검을 받는 것이 좋습니다", "사용하지 않을 때도 계량기가 움직이면 급수 계통을 우선 확인해야 합니다", "누수 위치가 확인되기 전 넓게 철거하지 않는 것이 복구 범위를 줄이는 데 도움이 됩니다"]
+  }
+};
 
 const PROMO_IMAGES = [
   { file: "promo-24h-consult.jpg", label: "24시간 상담" },
@@ -211,6 +228,24 @@ function generatePromoAssets() {
 
     if (!fs.existsSync(sourcePath)) {
       throw new Error(`홍보 이미지 원본을 찾을 수 없습니다: ${sourcePath}`);
+    }
+
+    const base64 = fs.readFileSync(sourcePath, "utf8").trim();
+    fs.writeFileSync(path.join(destinationDir, image.file), Buffer.from(base64, "base64"));
+  }
+}
+
+function generateFieldAssets() {
+  const sourceDir = path.join(root, "data", "field-assets");
+  const destinationDir = path.join(distDir, "assets");
+
+  ensureDir(destinationDir);
+
+  for (const image of WORK_IMAGES) {
+    const sourcePath = path.join(sourceDir, `${image.file}.b64`);
+
+    if (!fs.existsSync(sourcePath)) {
+      throw new Error(`실제 작업사진 원본을 찾을 수 없습니다: ${sourcePath}`);
     }
 
     const base64 = fs.readFileSync(sourcePath, "utf8").trim();
@@ -414,6 +449,32 @@ function getOrderedWorkImages(prefix, area) {
     : ordered;
 }
 
+function pickVariant(items, area, salt) {
+  const digest = crypto.createHash("sha256").update(`${area.slug}:${salt}`).digest("hex");
+  return items[Number.parseInt(digest.slice(0, 8), 16) % items.length];
+}
+
+function renderLocalGuide(area, prefix) {
+  const variants = LOCAL_GUIDE_VARIANTS[prefix];
+  const areaName = escapeHtml(getAreaShortName(area));
+  const focus = escapeHtml(pickVariant(variants.focus, area, "focus"));
+  const setting = escapeHtml(pickVariant(variants.setting, area, "setting"));
+  const cause = escapeHtml(pickVariant(variants.cause, area, "cause"));
+  const check = escapeHtml(pickVariant(variants.check, area, "check"));
+  const prevention = escapeHtml(pickVariant(variants.prevention, area, "prevention"));
+  const serviceLabel = prefix === "nusu" ? "누수탐지" : "하수구막힘";
+
+  return `
+    <section class="local-guide" aria-labelledby="local-guide-title" style="max-width:1080px;margin:30px auto;padding:28px 20px;border:1px solid #dbe5f1;border-radius:18px;background:#f8fbff">
+      <h2 id="local-guide-title" style="margin:0 0 14px">${areaName} ${serviceLabel} 증상별 점검 안내</h2>
+      <p><strong>${areaName}</strong>에서 상담할 때는 ${setting}에서 나타나는 <strong>${focus}</strong> 증상을 구체적으로 알려주시면 확인 방향을 정하는 데 도움이 됩니다.</p>
+      <p>현장에서는 ${cause} 가능성을 포함해 배관의 사용 환경과 증상 발생 범위를 확인합니다. ${check}.</p>
+      <p>${prevention}. 건물마다 배관 구조가 다르므로 실제 작업 범위와 비용은 현장 확인 후 안내합니다.</p>
+      <p style="margin:14px 0 0;color:#5f6368;font-size:13px">이 내용은 ${areaName} 상담을 위한 증상별 안내이며, 해당 지역에서 특정 작업을 완료했다는 의미는 아닙니다.</p>
+    </section>
+  `;
+}
+
 function renderWorkGallery(area, prefix) {
   const areaName = escapeHtml(getAreaShortName(area));
   const serviceLabel = prefix === "nusu" ? "누수탐지" : "하수구막힘";
@@ -421,8 +482,8 @@ function renderWorkGallery(area, prefix) {
 
   return `
     <section class="work-gallery" aria-labelledby="work-gallery-title" style="max-width:1080px;margin:30px auto;padding:26px 20px;border:1px solid #e5e7eb;border-radius:18px;background:#fff">
-      <h2 id="work-gallery-title" style="margin:0 0 8px">${areaName} ${serviceLabel} 작업사진</h2>
-      <p style="margin:0 0 18px;color:#6b7280">응급배관119의 배관 점검·막힘 제거·누수탐지 작업 이미지입니다.</p>
+      <h2 id="work-gallery-title" style="margin:0 0 8px">${areaName} ${serviceLabel} 작업 참고사진</h2>
+      <p style="margin:0 0 18px;color:#6b7280">응급배관119가 직접 촬영한 실제 배관 점검·막힘 제거 현장 자료입니다. 사진의 촬영지는 현재 보고 계신 지역과 다를 수 있습니다.</p>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px">
         ${images.map((image, index) => {
           const description = escapeHtml(prefix === "nusu" ? image.nusu : image.hasugu);
@@ -432,7 +493,7 @@ function renderWorkGallery(area, prefix) {
             <img src="../../assets/${image.file}" width="1200" height="900" loading="${loading}" decoding="async"${priority}
               alt="${areaName} ${serviceLabel} ${description}"
               style="display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;border-radius:12px" />
-            <figcaption style="padding:8px 2px 2px;color:#4b5563;font-size:14px">${areaName} ${description}</figcaption>
+            <figcaption style="padding:8px 2px 2px;color:#4b5563;font-size:14px">${description}</figcaption>
           </figure>`;
         }).join("\n")}
       </div>
@@ -1214,6 +1275,7 @@ function build() {
   const sitemapUrls = [];
 
   copyAssets();
+  generateFieldAssets();
   generatePromoAssets();
   generateConsultBannerAsset();
   copyPublicFiles();
@@ -1277,6 +1339,7 @@ function build() {
       let html = replaceAllText(template, area, service);
       html = addWorkImageMeta(html, area, prefix);
       html = injectAfterRequestForm(html, renderConsultBanner(area, prefix));
+      html = injectBeforeClosingTag(html, renderLocalGuide(area, prefix));
       html = injectBeforeClosingTag(html, renderWorkGallery(area, prefix));
       html = injectBeforeClosingTag(html, renderPromoGallery(area, prefix));
       html = injectBeforeClosingTag(
@@ -1335,12 +1398,3 @@ function build() {
     `생성 완료: 지역 ${areas.length}개 × 서비스 ${services.length}개 = ${
       areas.length * services.length
     }개 지역 페이지`
-  );
-
-  console.log("대표 페이지 및 전체 지역 페이지네이션 생성 완료");
-  console.log(`sitemap.xml 생성 완료: ${new Set(sitemapUrls).size}개 URL`);
-  console.log("robots.txt 및 기존 주소 301 리디렉션 생성 완료");
-  console.log("assets/public/Google verification file 복사 완료");
-}
-
-build();
