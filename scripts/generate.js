@@ -1251,6 +1251,27 @@ function makeRedirects(areas, services) {
     .concat("\n");
 }
 
+function validateLocalSeo(html, area, prefix) {
+  const serviceLabel = prefix === "nusu" ? "누수탐지" : "하수구막힘";
+  const areaName = getAreaShortName(area);
+  const checks = [
+    ["title", new RegExp(`<title>[^<]*${area.dong}[^<]*${serviceLabel}[^<]*<\\/title>`)],
+    ["description", new RegExp(`<meta\\s+name="description"\\s+content="[^"]*${area.dong}[^"]*${serviceLabel}`)],
+    ["H1", new RegExp(`<h1[^>]*>[^<]*${area.dong}[^<]*${serviceLabel}[^<]*<\\/h1>`)],
+    ["지역 안내 H2", new RegExp(`<h2[^>]*>[^<]*${area.dong}[^<]*${serviceLabel}`)],
+    ["작업사진 ALT", new RegExp(`alt="${areaName} ${serviceLabel} [^"]+"`)],
+    ["서비스 내부링크", new RegExp(`href="/${prefix}/${area.numericId}/"[^>]*>${area.dong} ${serviceLabel}`)]
+  ];
+
+  const missing = checks.filter(([, pattern]) => !pattern.test(html)).map(([label]) => label);
+
+  if (missing.length > 0) {
+    throw new Error(
+      `지역 SEO 요소 누락: ${getAreaName(area)} ${serviceLabel} - ${missing.join(", ")}`
+    );
+  }
+}
+
 function build() {
   fs.rmSync(distDir, { recursive: true, force: true });
   ensureDir(distDir);
@@ -1346,6 +1367,7 @@ function build() {
         html,
         renderDetailPagination(areas, prefix, areaIndex)
       );
+      validateLocalSeo(html, area, prefix);
       const outDir = path.join(distDir, prefix, area.numericId);
 
       ensureDir(outDir);
