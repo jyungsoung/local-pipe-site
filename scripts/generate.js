@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import crypto from "node:crypto";
 
 const root = process.cwd();
 
@@ -7,6 +8,9 @@ const areasCsvPath = path.join(root, "data", "areas.csv");
 const servicesPath = path.join(root, "data", "services.json");
 const templatesDir = path.join(root, "templates");
 const distDir = path.join(root, "dist");
+
+const AREA_PAGE_SIZE = 60;
+const PAGINATION_WINDOW = 7;
 
 const SITE_INFO = {
   brandName: "응급배관119",
@@ -115,6 +119,12 @@ function normalizePrefix(prefix) {
   return String(prefix || "").replace(/^\/+|\/+$/g, "");
 }
 
+function getNumericAreaId(slug) {
+  const digest = crypto.createHash("sha256").update(String(slug)).digest("hex");
+  const id = BigInt(`0x${digest.slice(0, 16)}`) % 1000000000000n;
+  return id.toString().padStart(12, "0");
+}
+
 function escapeHtml(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -145,7 +155,7 @@ function replaceAllText(template, area, service) {
     .replaceAll("[시도명]", area.sido)
     .replaceAll("[구명]", area.sigungu)
     .replaceAll("[동명]", area.dong)
-    .replaceAll("[지역슬러그]", area.slug)
+    .replaceAll("[지역슬러그]", area.numericId)
     .replaceAll("[서비스명]", service.name)
     .replaceAll("[서비스타입]", service.type)
     .replaceAll("[팜플렛이미지]", `../../assets/${service.pamphlet}`);
@@ -212,7 +222,7 @@ function renderAreaLinks(areas, prefix, label, limit = 120) {
         ${selectedAreas
           .map((area) => {
             const areaName = escapeHtml(getAreaShortName(area));
-            const href = `/${prefix}/${area.slug}/`;
+            const href = `/${prefix}/${area.numericId}/`;
 
             return `<a href="${href}">${areaName} ${escapeHtml(label)}</a>`;
           })
@@ -220,6 +230,117 @@ function renderAreaLinks(areas, prefix, label, limit = 120) {
       </div>
     </section>
   `;
+}
+
+function getAreaDirectoryPath(prefix, page) {
+  return `/${prefix}/regions/${page}/`;
+}
+
+function getPaginationRange(currentPage, totalPages) {
+  const visible = Math.min(PAGINATION_WINDOW, totalPages);
+  let start = Math.max(1, currentPage - Math.floor(visible / 2));
+  let end = Math.min(totalPages, start + visible - 1);
+  start = Math.max(1, end - visible + 1);
+  return Array.from({ length: end - start + 1 }, (_, index) => start + index);
+}
+
+function renderPagination(prefix, currentPage, totalPages) {
+  if (totalPages <= 1) return "";
+
+  const pages = getPaginationRange(currentPage, totalPages);
+  const previous = currentPage > 1
+    ? `<a href="${getAreaDirectoryPath(prefix, currentPage - 1)}" rel="prev">이전</a>`
+    : `<span class="disabled">이전</span>`;
+  const next = currentPage < totalPages
+    ? `<a href="${getAreaDirectoryPath(prefix, currentPage + 1)}" rel="next">다음</a>`
+    : `<span class="disabled">다음</span>`;
+
+  return `
+    <nav class="pagination" aria-label="전체 지역 페이지 이동">
+      ${previous}
+      ${pages.map((page) => page === currentPage
+        ? `<strong aria-current="page">${page}</strong>`
+        : `<a href="${getAreaDirectoryPath(prefix, page)}">${page}</a>`
+      ).join("\n")}
+      ${next}
+    </nav>
+  `;
+}
+
+function renderAreaDirectorySection(areas, prefix, label, currentPage) {
+  const totalPages = Math.ceil(areas.length / AREA_PAGE_SIZE);
+  const start = (currentPage - 1) * AREA_PAGE_SIZE;
+  const pageAreas = areas.slice(start, start + AREA_PAGE_SIZE);
+
+  return `
+    <section class="section">
+      <h2>전체 지역 ${escapeHtml(label)} 페이지</h2>
+      <p class="muted">서울·경기 전체 지역을 ${AREA_PAGE_SIZE}개씩 나누어 연결했습니다. ${currentPage} / ${totalPages} 페이지</p>
+      <div class="area-grid">
+        ${pageAreas.map((area) => `
+          <a href="/${prefix}/${area.numericId}/">
+            ${escapeHtml(getAreaShortName(area))} ${escapeHtml(label)}
+          </a>
+        `).join("\n")}
+      </div>
+      ${renderPagination(prefix, currentPage, totalPages)}
+    </section>
+  `;
+}
+
+function renderAreaDirectoryPage(prefix, areas, currentPage) {
+  const content = CATEGORY_CONTENT[prefix];
+  const label = content.label === "하수" ? "하수구막힘" : "누수탐지";
+  const totalPages = Math.ceil(areas.length / AREA_PAGE_SIZE);
+
+  if (!content || currentPage < 1 || currentPage > totalPages) {
+    throw new Error(`잘못된 지역 목록 페이지입니다: ${prefix} ${currentPage}`);
+  }
+
+  const title = `서울·경기 전체 지역 ${label} 목록 ${currentPage}페이지 | ${SITE_INFO.brandName}`;
+  const description = `서울·경기 동·읍·면별 ${label} 상담 페이지 목록 ${currentPage}페이지입니다.`;
+
+  const body = `
+    <section class="hero">
+      <div class="hero-inner">
+        <h1>서울·경기 전체 지역 ${escapeHtml(label)} 목록</h1>
+        <p>각 지역명을 선택하면 해당 동·읍·면의 상담 페이지로 이동합니다.</p>
+      </div>
+    </section>
+    <main class="container">
+      ${renderAreaDirectorySection(areas, prefix, label, currentPage)}
+    </main>
+  `;
+
+  return renderBasePage({
+    title,
+    description,
+    canonical: `${SITE_INFO.siteUrl}${getAreaDirectoryPath(prefix, currentPage)}`,
+    body
+  });
+}
+
+function renderDetailPagination(areas, prefix, areaIndex) {
+  const totalPages = Math.ceil(areas.length / AREA_PAGE_SIZE);
+  const currentPage = Math.floor(areaIndex / AREA_PAGE_SIZE) + 1;
+
+  return `
+    <section aria-label="전체 지역 페이지" style="max-width:1080px;margin:28px auto;padding:24px 20px;border-top:1px solid #e5e7eb">
+      <h2 style="margin:0 0 8px">서울·경기 전체 지역 페이지</h2>
+      <p style="margin:0 0 16px;color:#6b7280">숫자를 누르면 다른 동·읍·면의 지역 목록으로 이동합니다.</p>
+      <div class="pagination">
+        ${renderPagination(prefix, currentPage, totalPages)}
+      </div>
+    </section>
+  `;
+}
+
+function injectBeforeClosingTag(html, block) {
+  if (html.includes("</main>")) {
+    return html.replace("</main>", `${block}\n</main>`);
+  }
+
+  return html.replace("</body>", `${block}\n</body>`);
 }
 
 function renderBasePage({ title, description, canonical, body }) {
@@ -449,6 +570,36 @@ function renderBasePage({ title, description, canonical, body }) {
       padding: 10px 12px;
       background: #fff;
       font-size: 14px;
+    }
+
+    .pagination {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 24px;
+    }
+
+    .pagination a,
+    .pagination strong,
+    .pagination .disabled {
+      min-width: 40px;
+      padding: 9px 12px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      text-align: center;
+      background: #fff;
+    }
+
+    .pagination strong {
+      color: #fff;
+      background: var(--blue);
+      border-color: var(--blue);
+    }
+
+    .pagination .disabled {
+      color: #9ca3af;
+      background: #f9fafb;
     }
 
     .pamphlet {
@@ -739,12 +890,39 @@ Sitemap: ${SITE_INFO.siteUrl}/sitemap.xml
 `;
 }
 
+function makeRedirects(areas, services) {
+  return services
+    .flatMap((service) => {
+      const prefix = normalizePrefix(service.urlPrefix);
+
+      return areas.map(
+        (area) => `/${prefix}/${area.slug}/  /${prefix}/${area.numericId}/  301!`
+      );
+    })
+    .join("\n")
+    .concat("\n");
+}
+
 function build() {
   fs.rmSync(distDir, { recursive: true, force: true });
   ensureDir(distDir);
 
-  const areas = readCsv(areasCsvPath);
+  const areas = readCsv(areasCsvPath).map((area) => ({
+    ...area,
+    numericId: getNumericAreaId(area.slug)
+  }));
   const services = JSON.parse(fs.readFileSync(servicesPath, "utf8"));
+
+  const numericIds = new Set();
+  for (const area of areas) {
+    if (!area.slug) continue;
+
+    if (numericIds.has(area.numericId)) {
+      throw new Error(`숫자 지역 ID가 중복되었습니다: ${area.numericId}`);
+    }
+
+    numericIds.add(area.numericId);
+  }
 
   const sitemapUrls = [];
 
@@ -774,6 +952,20 @@ function build() {
       );
 
       sitemapUrls.push(`${SITE_INFO.siteUrl}/${prefix}/`);
+
+      const totalDirectoryPages = Math.ceil(areas.length / AREA_PAGE_SIZE);
+      for (let page = 1; page <= totalDirectoryPages; page += 1) {
+        const directoryDir = path.join(serviceDir, "regions", String(page));
+        ensureDir(directoryDir);
+        fs.writeFileSync(
+          path.join(directoryDir, "index.html"),
+          renderAreaDirectoryPage(prefix, areas, page),
+          "utf8"
+        );
+        sitemapUrls.push(
+          `${SITE_INFO.siteUrl}${getAreaDirectoryPath(prefix, page)}`
+        );
+      }
     }
   }
 
@@ -787,20 +979,23 @@ function build() {
 
     const template = fs.readFileSync(templatePath, "utf8");
 
-    for (const area of areas) {
+    for (const [areaIndex, area] of areas.entries()) {
       if (!area.slug) {
         console.warn(`slug가 없는 지역을 건너뜁니다: ${getAreaName(area)}`);
         continue;
       }
 
-      const html = replaceAllText(template, area, service);
-      const outDir = path.join(distDir, prefix, area.slug);
+      const html = injectBeforeClosingTag(
+        replaceAllText(template, area, service),
+        renderDetailPagination(areas, prefix, areaIndex)
+      );
+      const outDir = path.join(distDir, prefix, area.numericId);
 
       ensureDir(outDir);
 
       fs.writeFileSync(path.join(outDir, "index.html"), html, "utf8");
 
-      sitemapUrls.push(`${SITE_INFO.siteUrl}/${prefix}/${area.slug}/`);
+      sitemapUrls.push(`${SITE_INFO.siteUrl}/${prefix}/${area.numericId}/`);
     }
   }
 
@@ -836,6 +1031,11 @@ function build() {
   );
 
   fs.writeFileSync(path.join(distDir, "robots.txt"), makeRobots(), "utf8");
+  fs.writeFileSync(
+    path.join(distDir, "_redirects"),
+    makeRedirects(areas, services),
+    "utf8"
+  );
 
   console.log(
     `생성 완료: 지역 ${areas.length}개 × 서비스 ${services.length}개 = ${
@@ -843,9 +1043,9 @@ function build() {
     }개 지역 페이지`
   );
 
-  console.log("대표 페이지 생성 완료: /, /hasugu/, /nusu/");
+  console.log("대표 페이지 및 전체 지역 페이지네이션 생성 완료");
   console.log(`sitemap.xml 생성 완료: ${new Set(sitemapUrls).size}개 URL`);
-  console.log("robots.txt 생성 완료");
+  console.log("robots.txt 및 기존 주소 301 리디렉션 생성 완료");
   console.log("assets/public/Google verification file 복사 완료");
 }
 
