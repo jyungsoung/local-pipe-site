@@ -341,21 +341,19 @@ function renderDetailPagination(areas, prefix, areaIndex) {
   const visibleAreas = areas.slice(start, end);
 
   const previous = previousArea
-    ? `<a href="/${prefix}/${previousArea.numericId}/" rel="prev">이전 동</a>`
-    : `<span class="disabled">이전 동</span>`;
+    ? `<a href="/${prefix}/${previousArea.numericId}/" rel="prev" aria-label="이전 동 페이지">‹</a>`
+    : `<span class="disabled" aria-hidden="true">‹</span>`;
   const next = nextArea
-    ? `<a href="/${prefix}/${nextArea.numericId}/" rel="next">다음 동</a>`
-    : `<span class="disabled">다음 동</span>`;
+    ? `<a href="/${prefix}/${nextArea.numericId}/" rel="next" aria-label="다음 동 페이지">›</a>`
+    : `<span class="disabled" aria-hidden="true">›</span>`;
 
   return `
-    <section aria-label="인근 동·읍·면 바로가기" style="max-width:1080px;margin:28px auto;padding:24px 20px;border-top:1px solid #e5e7eb">
-      <h2 style="margin:0 0 8px">다른 지역 바로가기</h2>
-      <p style="margin:0 0 16px;color:#6b7280">버튼을 누르면 지역안내가 아닌 해당 동·읍·면의 실제 상담 페이지로 바로 이동합니다.</p>
+    <section aria-label="동·읍·면 페이지 바로가기" style="max-width:1080px;margin:28px auto;padding:24px 20px;border-top:1px solid #e5e7eb">
       <nav class="pagination" aria-label="동·읍·면 개별 페이지 이동">
         ${previous}
-        ${visibleAreas.map((area) => area.numericId === areas[areaIndex].numericId
-          ? `<strong aria-current="page">${escapeHtml(area.dong || getAreaShortName(area))}</strong>`
-          : `<a href="/${prefix}/${area.numericId}/">${escapeHtml(area.dong || getAreaShortName(area))}</a>`
+        ${visibleAreas.map((area, index) => area.numericId === areas[areaIndex].numericId
+          ? `<strong aria-current="page">${start + index + 1}</strong>`
+          : `<a href="/${prefix}/${area.numericId}/" aria-label="${escapeHtml(getAreaShortName(area))} 페이지">${start + index + 1}</a>`
         ).join("\n")}
         ${next}
       </nav>
