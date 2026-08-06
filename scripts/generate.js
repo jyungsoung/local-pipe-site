@@ -816,9 +816,23 @@ function renderBasePage({ title, description, canonical, body }) {
         grid-template-columns: 1fr;
       }
 
+      .promo-gallery {
+        overflow: hidden;
+      }
+
       .promo-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        display: flex;
+        flex-wrap: nowrap;
         gap: 10px;
+        overflow-x: auto;
+        padding-bottom: 8px;
+        scroll-snap-type: x proximity;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .promo-grid figure {
+        flex: 0 0 132px;
+        scroll-snap-align: start;
       }
 
       .detail-pagination {
