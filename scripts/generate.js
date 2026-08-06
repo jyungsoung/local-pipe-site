@@ -218,6 +218,21 @@ function generatePromoAssets() {
   }
 }
 
+function generateConsultBannerAsset() {
+  const sourcePath = path.join(root, "data", "consult-banner.jpg.b64");
+
+  if (!fs.existsSync(sourcePath)) {
+    throw new Error(`상담 신청 배너 원본을 찾을 수 없습니다: ${sourcePath}`);
+  }
+
+  ensureDir(path.join(distDir, "assets"));
+  const base64 = fs.readFileSync(sourcePath, "utf8").trim();
+  fs.writeFileSync(
+    path.join(distDir, "assets", "consult-banner.jpg"),
+    Buffer.from(base64, "base64")
+  );
+}
+
 function copyPublicFiles() {
   const src = path.join(root, "public");
 
@@ -475,6 +490,22 @@ function renderPromoGallery(area, prefix) {
             alt="${areaName} ${serviceLabel} ${escapeHtml(image.label)} 응급배관119 1668-1321" />
         </figure>`).join("\n")}
       </div>
+    </section>
+  `;
+}
+
+function renderConsultBanner(area, prefix) {
+  const areaName = escapeHtml(getAreaShortName(area));
+  const serviceLabel = prefix === "nusu" ? "누수탐지" : "하수구막힘";
+
+  return `
+    <section class="consult-banner" aria-label="${areaName} ${serviceLabel} 응급배관119 상담 안내"
+      style="max-width:1080px;margin:22px auto 30px;padding:0 20px">
+      <a href="tel:${escapeHtml(SITE_INFO.phone)}" aria-label="응급배관119 ${SITE_INFO.phone} 전화 상담">
+        <img src="../../assets/consult-banner.jpg" width="1600" height="533" loading="eager" decoding="async"
+          alt="${areaName} ${serviceLabel} 24시간 긴급출동 응급배관119 ${SITE_INFO.phone}"
+          style="display:block;width:100%;height:auto;border-radius:14px;box-shadow:0 8px 24px rgba(15,23,42,.14)" />
+      </a>
     </section>
   `;
 }
@@ -1184,6 +1215,7 @@ function build() {
 
   copyAssets();
   generatePromoAssets();
+  generateConsultBannerAsset();
   copyPublicFiles();
   copyGoogleVerificationFiles();
 
@@ -1244,6 +1276,7 @@ function build() {
 
       let html = replaceAllText(template, area, service);
       html = addWorkImageMeta(html, area, prefix);
+      html = injectAfterRequestForm(html, renderConsultBanner(area, prefix));
       html = injectBeforeClosingTag(html, renderWorkGallery(area, prefix));
       html = injectBeforeClosingTag(html, renderPromoGallery(area, prefix));
       html = injectBeforeClosingTag(
