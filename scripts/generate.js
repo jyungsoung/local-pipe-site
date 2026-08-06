@@ -434,11 +434,10 @@ function renderPromoGallery(area, prefix) {
       <h2 id="promo-gallery-title" style="margin:0 0 8px">${areaName} 배관 서비스 안내</h2>
       <p style="margin:0 0 18px;color:#6b7280">응급배관119 대표번호 1668-1321 · 하수구막힘과 누수탐지 상담</p>
       <div class="promo-grid">
-        ${PROMO_IMAGES.map((image) => `<figure style="margin:0">
-          <img src="../../assets/${image.file}" width="1000" height="1000" loading="lazy" decoding="async"
-            alt="${areaName} ${serviceLabel} ${escapeHtml(image.label)} 응급배관119 1668-1321"
-            style="display:block;width:100%;height:auto;aspect-ratio:1/1;object-fit:cover;border-radius:8px" />
-          <figcaption style="padding:6px 1px 1px;color:#4b5563;font-size:12px;line-height:1.35">${areaName} ${escapeHtml(image.label)}</figcaption>
+        ${PROMO_IMAGES.map((image) => `<figure class="promo-card">
+          <img class="promo-thumb" src="../../assets/${image.file}" width="1000" height="1000" loading="lazy" decoding="async"
+            alt="${areaName} ${serviceLabel} ${escapeHtml(image.label)} 응급배관119 1668-1321" />
+          <figcaption>${areaName} ${escapeHtml(image.label)}</figcaption>
         </figure>`).join("\n")}
       </div>
     </section>
@@ -757,9 +756,34 @@ function renderBasePage({ title, description, canonical, body }) {
 
     .promo-grid {
       display: grid;
-      grid-template-columns: repeat(7, minmax(0, 1fr));
+      grid-template-columns: repeat(7, 132px);
+      justify-content: center;
       gap: 8px;
       align-items: start;
+    }
+
+    .promo-card {
+      width: 132px;
+      min-width: 0;
+      margin: 0;
+    }
+
+    .promo-thumb {
+      display: block;
+      width: 132px !important;
+      max-width: 132px !important;
+      height: 132px !important;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .promo-card figcaption {
+      padding: 6px 1px 1px;
+      color: #4b5563;
+      font-size: 11px;
+      line-height: 1.35;
+      text-align: center;
     }
 
     .pamphlet {
@@ -830,7 +854,7 @@ function renderBasePage({ title, description, canonical, body }) {
         -webkit-overflow-scrolling: touch;
       }
 
-      .promo-grid figure {
+      .promo-card {
         flex: 0 0 132px;
         scroll-snap-align: start;
       }
