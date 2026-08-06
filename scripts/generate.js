@@ -28,6 +28,16 @@ const WORK_IMAGES = [
   { file: "work-floor-drain.jpg", hasugu: "화장실 바닥 배수구 막힘 제거", nusu: "욕실 배수 배관 점검 작업" }
 ];
 
+const PROMO_IMAGES = [
+  { file: "promo-24h-consult.jpg", label: "24시간 상담" },
+  { file: "promo-fast-dispatch.jpg", label: "신속 출동" },
+  { file: "promo-high-pressure.jpg", label: "배관 고압세척" },
+  { file: "promo-pipe-camera.jpg", label: "배관 내시경" },
+  { file: "promo-kitchen-sink.jpg", label: "싱크대 막힘" },
+  { file: "promo-toilet.jpg", label: "변기 막힘" },
+  { file: "promo-leak-detection.jpg", label: "누수탐지" }
+];
+
 const CATEGORY_CONTENT = {
   hasugu: {
     label: "하수",
@@ -185,6 +195,26 @@ function copyAssets() {
     if (fs.statSync(srcFile).isFile()) {
       fs.copyFileSync(srcFile, destFile);
     }
+  }
+}
+
+function generatePromoAssets() {
+  const sourceDir = path.join(root, "data", "promo-assets");
+  const destinationDir = path.join(distDir, "assets");
+
+  if (!fs.existsSync(sourceDir)) return;
+
+  ensureDir(destinationDir);
+
+  for (const image of PROMO_IMAGES) {
+    const sourcePath = path.join(sourceDir, `${image.file}.b64`);
+
+    if (!fs.existsSync(sourcePath)) {
+      throw new Error(`홍보 이미지 원본을 찾을 수 없습니다: ${sourcePath}`);
+    }
+
+    const base64 = fs.readFileSync(sourcePath, "utf8").trim();
+    fs.writeFileSync(path.join(destinationDir, image.file), Buffer.from(base64, "base64"));
   }
 }
 
@@ -390,6 +420,26 @@ function renderWorkGallery(area, prefix) {
             <figcaption style="padding:8px 2px 2px;color:#4b5563;font-size:14px">${areaName} ${description}</figcaption>
           </figure>`;
         }).join("\n")}
+      </div>
+    </section>
+  `;
+}
+
+function renderPromoGallery(area, prefix) {
+  const areaName = escapeHtml(getAreaShortName(area));
+  const serviceLabel = prefix === "nusu" ? "누수탐지" : "하수구막힘";
+
+  return `
+    <section class="promo-gallery" aria-labelledby="promo-gallery-title" style="max-width:1080px;margin:30px auto;padding:26px 20px;border:1px solid #e5e7eb;border-radius:18px;background:#f8fbff">
+      <h2 id="promo-gallery-title" style="margin:0 0 8px">${areaName} 배관 서비스 안내</h2>
+      <p style="margin:0 0 18px;color:#6b7280">응급배관119 대표번호 1668-1321 · 하수구막힘과 누수탐지 상담</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px">
+        ${PROMO_IMAGES.map((image) => `<figure style="margin:0">
+          <img src="../../assets/${image.file}" width="1000" height="1000" loading="lazy" decoding="async"
+            alt="${areaName} ${serviceLabel} ${escapeHtml(image.label)} 응급배관119 1668-1321"
+            style="display:block;width:100%;height:auto;aspect-ratio:1/1;object-fit:cover;border-radius:12px" />
+          <figcaption style="padding:8px 2px 2px;color:#4b5563;font-size:14px">${areaName} ${escapeHtml(image.label)}</figcaption>
+        </figure>`).join("\n")}
       </div>
     </section>
   `;
@@ -1002,6 +1052,7 @@ function build() {
   const sitemapUrls = [];
 
   copyAssets();
+  generatePromoAssets();
   copyPublicFiles();
   copyGoogleVerificationFiles();
 
@@ -1063,6 +1114,7 @@ function build() {
       let html = replaceAllText(template, area, service);
       html = addWorkImageMeta(html, area, prefix);
       html = injectBeforeClosingTag(html, renderWorkGallery(area, prefix));
+      html = injectBeforeClosingTag(html, renderPromoGallery(area, prefix));
       html = injectBeforeClosingTag(
         html,
         renderDetailPagination(areas, prefix, areaIndex)
