@@ -1254,16 +1254,36 @@ function makeRedirects(areas, services) {
 function validateLocalSeo(html, area, prefix) {
   const serviceLabel = prefix === "nusu" ? "누수탐지" : "하수구막힘";
   const areaName = getAreaShortName(area);
+
+  const extract = (pattern) => html.match(pattern)?.[1] || "";
+  const titleText = extract(/<title>([^<]*)<\/title>/i);
+  const descriptionText = extract(
+    /<meta\s+name=["']description["']\s+content=["']([^"']*)["'][^>]*>/i
+  );
+  const h1Text = extract(/<h1[^>]*>([\s\S]*?)<\/h1>/i).replace(/<[^>]+>/g, "");
+  const h2Texts = [...html.matchAll(/<h2[^>]*>([\s\S]*?)<\/h2>/gi)]
+    .map((match) => match[1].replace(/<[^>]+>/g, ""));
+  const containsKeywords = (text) =>
+    text.includes(area.dong) && text.includes(serviceLabel);
+
   const checks = [
-    ["title", new RegExp(`<title>[^<]*${area.dong}[^<]*${serviceLabel}[^<]*<\\/title>`)],
-    ["description", new RegExp(`<meta\\s+name="description"\\s+content="[^"]*${area.dong}[^"]*${serviceLabel}`)],
-    ["H1", new RegExp(`<h1[^>]*>[^<]*${area.dong}[^<]*${serviceLabel}[^<]*<\\/h1>`)],
-    ["지역 안내 H2", new RegExp(`<h2[^>]*>[^<]*${area.dong}[^<]*${serviceLabel}`)],
-    ["작업사진 ALT", new RegExp(`alt="${areaName} ${serviceLabel} [^"]+"`)],
-    ["서비스 내부링크", new RegExp(`href="/${prefix}/${area.numericId}/"[^>]*>${area.dong} ${serviceLabel}`)]
+    ["title", containsKeywords(titleText)],
+    ["description", containsKeywords(descriptionText)],
+    ["H1", containsKeywords(h1Text)],
+    ["지역 안내 H2", h2Texts.some(containsKeywords)],
+    [
+      "작업사진 ALT",
+      new RegExp(`alt=["']${areaName} ${serviceLabel} [^"']+["']`).test(html)
+    ],
+    [
+      "서비스 내부링크",
+      new RegExp(
+        `href=["']/${prefix}/${area.numericId}/["'][^>]*>\\s*${area.dong} ${serviceLabel}`
+      ).test(html)
+    ]
   ];
 
-  const missing = checks.filter(([, pattern]) => !pattern.test(html)).map(([label]) => label);
+  const missing = checks.filter(([, passed]) => !passed).map(([label]) => label);
 
   if (missing.length > 0) {
     throw new Error(
