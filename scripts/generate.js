@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import crypto from "node:crypto";
 
 const root = process.cwd();
 
@@ -115,6 +116,12 @@ function normalizePrefix(prefix) {
   return String(prefix || "").replace(/^\/+|\/+$/g, "");
 }
 
+function getNumericAreaId(slug) {
+  const digest = crypto.createHash("sha256").update(String(slug)).digest("hex");
+  const id = BigInt(`0x${digest.slice(0, 16)}`) % 1000000000000n;
+  return id.toString().padStart(12, "0");
+}
+
 function escapeHtml(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -145,7 +152,7 @@ function replaceAllText(template, area, service) {
     .replaceAll("[시도명]", area.sido)
     .replaceAll("[구명]", area.sigungu)
     .replaceAll("[동명]", area.dong)
-    .replaceAll("[지역슬러그]", area.slug)
+    .replaceAll("[지역슬러그]", area.numericId)
     .replaceAll("[서비스명]", service.name)
     .replaceAll("[서비스타입]", service.type)
     .replaceAll("[팜플렛이미지]", `../../assets/${service.pamphlet}`);
@@ -212,7 +219,7 @@ function renderAreaLinks(areas, prefix, label, limit = 120) {
         ${selectedAreas
           .map((area) => {
             const areaName = escapeHtml(getAreaShortName(area));
-            const href = `/${prefix}/${area.slug}/`;
+            const href = `/${prefix}/${area.numericId}/`;
 
             return `<a href="${href}">${areaName} ${escapeHtml(label)}</a>`;
           })
@@ -739,12 +746,39 @@ Sitemap: ${SITE_INFO.siteUrl}/sitemap.xml
 `;
 }
 
+function makeRedirects(areas, services) {
+  return services
+    .flatMap((service) => {
+      const prefix = normalizePrefix(service.urlPrefix);
+
+      return areas.map(
+        (area) => `/${prefix}/${area.slug}/  /${prefix}/${area.numericId}/  301!`
+      );
+    })
+    .join("\n")
+    .concat("\n");
+}
+
 function build() {
   fs.rmSync(distDir, { recursive: true, force: true });
   ensureDir(distDir);
 
-  const areas = readCsv(areasCsvPath);
+  const areas = readCsv(areasCsvPath).map((area) => ({
+    ...area,
+    numericId: getNumericAreaId(area.slug)
+  }));
   const services = JSON.parse(fs.readFileSync(servicesPath, "utf8"));
+
+  const numericIds = new Set();
+  for (const area of areas) {
+    if (!area.slug) continue;
+
+    if (numericIds.has(area.numericId)) {
+      throw new Error(`숫자 지역 ID가 중복되었습니다: ${area.numericId}`);
+    }
+
+    numericIds.add(area.numericId);
+  }
 
   const sitemapUrls = [];
 
@@ -794,13 +828,13 @@ function build() {
       }
 
       const html = replaceAllText(template, area, service);
-      const outDir = path.join(distDir, prefix, area.slug);
+      const outDir = path.join(distDir, prefix, area.numericId);
 
       ensureDir(outDir);
 
       fs.writeFileSync(path.join(outDir, "index.html"), html, "utf8");
 
-      sitemapUrls.push(`${SITE_INFO.siteUrl}/${prefix}/${area.slug}/`);
+      sitemapUrls.push(`${SITE_INFO.siteUrl}/${prefix}/${area.numericId}/`);
     }
   }
 
@@ -836,6 +870,11 @@ function build() {
   );
 
   fs.writeFileSync(path.join(distDir, "robots.txt"), makeRobots(), "utf8");
+  fs.writeFileSync(
+    path.join(distDir, "_redirects"),
+    makeRedirects(areas, services),
+    "utf8"
+  );
 
   console.log(
     `생성 완료: 지역 ${areas.length}개 × 서비스 ${services.length}개 = ${
@@ -845,7 +884,7 @@ function build() {
 
   console.log("대표 페이지 생성 완료: /, /hasugu/, /nusu/");
   console.log(`sitemap.xml 생성 완료: ${new Set(sitemapUrls).size}개 URL`);
-  console.log("robots.txt 생성 완료");
+  console.log("robots.txt 및 기존 주소 301 리디렉션 생성 완료");
   console.log("assets/public/Google verification file 복사 완료");
 }
 
