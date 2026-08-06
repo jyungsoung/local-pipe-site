@@ -1398,3 +1398,12 @@ function build() {
     `생성 완료: 지역 ${areas.length}개 × 서비스 ${services.length}개 = ${
       areas.length * services.length
     }개 지역 페이지`
+  );
+
+  console.log("대표 페이지 및 전체 지역 페이지네이션 생성 완료");
+  console.log(`sitemap.xml 생성 완료: ${new Set(sitemapUrls).size}개 URL`);
+  console.log("robots.txt 및 기존 주소 301 리디렉션 생성 완료");
+  console.log("assets/public/Google verification file 복사 완료");
+}
+
+build();
