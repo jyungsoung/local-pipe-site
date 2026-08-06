@@ -321,16 +321,35 @@ function renderAreaDirectoryPage(prefix, areas, currentPage) {
 }
 
 function renderDetailPagination(areas, prefix, areaIndex) {
-  const totalPages = Math.ceil(areas.length / AREA_PAGE_SIZE);
-  const currentPage = Math.floor(areaIndex / AREA_PAGE_SIZE) + 1;
+  const visibleCount = 7;
+  const half = Math.floor(visibleCount / 2);
+  let start = Math.max(0, areaIndex - half);
+  let end = Math.min(areas.length, start + visibleCount);
+  start = Math.max(0, end - visibleCount);
+
+  const previousArea = areaIndex > 0 ? areas[areaIndex - 1] : null;
+  const nextArea = areaIndex < areas.length - 1 ? areas[areaIndex + 1] : null;
+  const visibleAreas = areas.slice(start, end);
+
+  const previous = previousArea
+    ? `<a href="/${prefix}/${previousArea.numericId}/" rel="prev">이전 동</a>`
+    : `<span class="disabled">이전 동</span>`;
+  const next = nextArea
+    ? `<a href="/${prefix}/${nextArea.numericId}/" rel="next">다음 동</a>`
+    : `<span class="disabled">다음 동</span>`;
 
   return `
-    <section aria-label="전체 지역 페이지" style="max-width:1080px;margin:28px auto;padding:24px 20px;border-top:1px solid #e5e7eb">
-      <h2 style="margin:0 0 8px">서울·경기 전체 지역 페이지</h2>
-      <p style="margin:0 0 16px;color:#6b7280">숫자를 누르면 다른 동·읍·면의 지역 목록으로 이동합니다.</p>
-      <div class="pagination">
-        ${renderPagination(prefix, currentPage, totalPages)}
-      </div>
+    <section aria-label="인근 동·읍·면 바로가기" style="max-width:1080px;margin:28px auto;padding:24px 20px;border-top:1px solid #e5e7eb">
+      <h2 style="margin:0 0 8px">다른 지역 바로가기</h2>
+      <p style="margin:0 0 16px;color:#6b7280">버튼을 누르면 지역안내가 아닌 해당 동·읍·면의 실제 상담 페이지로 바로 이동합니다.</p>
+      <nav class="pagination" aria-label="동·읍·면 개별 페이지 이동">
+        ${previous}
+        ${visibleAreas.map((area) => area.numericId === areas[areaIndex].numericId
+          ? `<strong aria-current="page">${escapeHtml(area.dong || getAreaShortName(area))}</strong>`
+          : `<a href="/${prefix}/${area.numericId}/">${escapeHtml(area.dong || getAreaShortName(area))}</a>`
+        ).join("\n")}
+        ${next}
+      </nav>
     </section>
   `;
 }
