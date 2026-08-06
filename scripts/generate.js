@@ -378,7 +378,7 @@ function renderDetailPagination(areas, prefix, areaIndex) {
     : `<span class="disabled" aria-hidden="true">›</span>`;
 
   return `
-    <section aria-label="동·읍·면 페이지 바로가기" style="max-width:1080px;margin:28px auto;padding:24px 20px;border-top:1px solid #e5e7eb">
+    <section class="detail-pagination" aria-label="동·읍·면 페이지 바로가기">
       <nav class="pagination" aria-label="동·읍·면 개별 페이지 이동">
         ${previous}
         ${visibleAreas.map((area, index) => area.numericId === areas[areaIndex].numericId
@@ -433,12 +433,12 @@ function renderPromoGallery(area, prefix) {
     <section class="promo-gallery" aria-labelledby="promo-gallery-title" style="max-width:1080px;margin:30px auto;padding:26px 20px;border:1px solid #e5e7eb;border-radius:18px;background:#f8fbff">
       <h2 id="promo-gallery-title" style="margin:0 0 8px">${areaName} 배관 서비스 안내</h2>
       <p style="margin:0 0 18px;color:#6b7280">응급배관119 대표번호 1668-1321 · 하수구막힘과 누수탐지 상담</p>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px">
+      <div class="promo-grid">
         ${PROMO_IMAGES.map((image) => `<figure style="margin:0">
           <img src="../../assets/${image.file}" width="1000" height="1000" loading="lazy" decoding="async"
             alt="${areaName} ${serviceLabel} ${escapeHtml(image.label)} 응급배관119 1668-1321"
-            style="display:block;width:100%;height:auto;aspect-ratio:1/1;object-fit:cover;border-radius:12px" />
-          <figcaption style="padding:8px 2px 2px;color:#4b5563;font-size:14px">${areaName} ${escapeHtml(image.label)}</figcaption>
+            style="display:block;width:100%;height:auto;aspect-ratio:1/1;object-fit:cover;border-radius:8px" />
+          <figcaption style="padding:6px 1px 1px;color:#4b5563;font-size:12px;line-height:1.35">${areaName} ${escapeHtml(image.label)}</figcaption>
         </figure>`).join("\n")}
       </div>
     </section>
@@ -728,8 +728,12 @@ function renderBasePage({ title, description, canonical, body }) {
       min-width: 40px;
       padding: 9px 12px;
       border: 1px solid var(--line);
-      border-radius: 9px;
+      width: 44px;
+      height: 44px;
+      padding: 9px 6px;
+      border-radius: 4px;
       text-align: center;
+      font-weight: 800;
       background: #fff;
     }
 
@@ -742,6 +746,20 @@ function renderBasePage({ title, description, canonical, body }) {
     .pagination .disabled {
       color: #9ca3af;
       background: #f9fafb;
+    }
+
+    .detail-pagination {
+      max-width: 1080px;
+      margin: 34px auto 0;
+      padding: 28px 20px 8px;
+      border-top: 1px solid var(--line);
+    }
+
+    .promo-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 8px;
+      align-items: start;
     }
 
     .pamphlet {
@@ -796,6 +814,29 @@ function renderBasePage({ title, description, canonical, body }) {
       .grid,
       .area-grid {
         grid-template-columns: 1fr;
+      }
+
+      .promo-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .detail-pagination {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .pagination {
+        gap: 6px;
+      }
+
+      .pagination a,
+      .pagination strong,
+      .pagination .disabled {
+        width: 38px;
+        min-width: 38px;
+        height: 38px;
+        padding: 6px 4px;
       }
 
       .section {
@@ -1132,7 +1173,7 @@ function build() {
       html = addWorkImageMeta(html, area, prefix);
       html = injectBeforeClosingTag(html, renderWorkGallery(area, prefix));
       html = injectBeforeClosingTag(html, renderPromoGallery(area, prefix));
-      html = injectAfterRequestForm(
+      html = injectBeforeClosingTag(
         html,
         renderDetailPagination(areas, prefix, areaIndex)
       );
