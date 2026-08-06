@@ -468,6 +468,23 @@ function injectBeforeClosingTag(html, block) {
   return html.replace("</body>", `${block}\n</body>`);
 }
 
+function injectAfterRequestForm(html, block) {
+  const requestFormStart = html.indexOf('<section class="top-form" id="request-form">');
+
+  if (requestFormStart === -1) {
+    throw new Error("상담 신청 영역을 찾을 수 없습니다.");
+  }
+
+  const requestFormEnd = html.indexOf("</section>", requestFormStart);
+
+  if (requestFormEnd === -1) {
+    throw new Error("상담 신청 영역의 끝을 찾을 수 없습니다.");
+  }
+
+  const insertionPoint = requestFormEnd + "</section>".length;
+  return `${html.slice(0, insertionPoint)}\n${block}${html.slice(insertionPoint)}`;
+}
+
 function renderBasePage({ title, description, canonical, body }) {
   return `<!doctype html>
 <html lang="ko">
@@ -1115,7 +1132,7 @@ function build() {
       html = addWorkImageMeta(html, area, prefix);
       html = injectBeforeClosingTag(html, renderWorkGallery(area, prefix));
       html = injectBeforeClosingTag(html, renderPromoGallery(area, prefix));
-      html = injectBeforeClosingTag(
+      html = injectAfterRequestForm(
         html,
         renderDetailPagination(areas, prefix, areaIndex)
       );
