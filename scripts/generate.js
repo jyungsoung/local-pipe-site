@@ -1251,6 +1251,47 @@ function makeRedirects(areas, services) {
     .concat("\n");
 }
 
+function validateLocalSeo(html, area, prefix) {
+  const serviceLabel = prefix === "nusu" ? "누수탐지" : "하수구막힘";
+  const areaName = getAreaShortName(area);
+
+  const extract = (pattern) => html.match(pattern)?.[1] || "";
+  const titleText = extract(/<title>([^<]*)<\/title>/i);
+  const descriptionText = extract(
+    /<meta\s+name=["']description["']\s+content=["']([^"']*)["'][^>]*>/i
+  );
+  const h1Text = extract(/<h1[^>]*>([\s\S]*?)<\/h1>/i).replace(/<[^>]+>/g, "");
+  const h2Texts = [...html.matchAll(/<h2[^>]*>([\s\S]*?)<\/h2>/gi)]
+    .map((match) => match[1].replace(/<[^>]+>/g, ""));
+  const containsKeywords = (text) =>
+    text.includes(area.dong) && text.includes(serviceLabel);
+
+  const checks = [
+    ["title", containsKeywords(titleText)],
+    ["description", containsKeywords(descriptionText)],
+    ["H1", containsKeywords(h1Text)],
+    ["지역 안내 H2", h2Texts.some(containsKeywords)],
+    [
+      "작업사진 ALT",
+      new RegExp(`alt=["']${areaName} ${serviceLabel} [^"']+["']`).test(html)
+    ],
+    [
+      "서비스 내부링크",
+      new RegExp(
+        `href=["']/${prefix}/${area.numericId}/["'][^>]*>\\s*${area.dong} ${serviceLabel}`
+      ).test(html)
+    ]
+  ];
+
+  const missing = checks.filter(([, passed]) => !passed).map(([label]) => label);
+
+  if (missing.length > 0) {
+    throw new Error(
+      `지역 SEO 요소 누락: ${getAreaName(area)} ${serviceLabel} - ${missing.join(", ")}`
+    );
+  }
+}
+
 function build() {
   fs.rmSync(distDir, { recursive: true, force: true });
   ensureDir(distDir);
@@ -1346,6 +1387,7 @@ function build() {
         html,
         renderDetailPagination(areas, prefix, areaIndex)
       );
+      validateLocalSeo(html, area, prefix);
       const outDir = path.join(distDir, prefix, area.numericId);
 
       ensureDir(outDir);
