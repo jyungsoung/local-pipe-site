@@ -19,6 +19,15 @@ const SITE_INFO = {
   siteUrl: "https://preeminent-fenglisu-4251ae.netlify.app"
 };
 
+const WORK_IMAGES = [
+  { file: "work-kitchen-sink.jpg", hasugu: "싱크대 배관 막힘 제거 작업", nusu: "싱크대 하부 배관 점검 작업" },
+  { file: "work-toilet-drain.jpg", hasugu: "변기 막힘 제거 작업", nusu: "욕실 배관 상태 점검 작업" },
+  { file: "work-high-pressure-jet.jpg", hasugu: "하수관 고압세척 작업", nusu: "외부 배관 점검 작업" },
+  { file: "work-pipe-camera.jpg", hasugu: "배관 내시경 막힘 원인 확인", nusu: "배관 내시경 누수 원인 확인" },
+  { file: "work-leak-detection.jpg", hasugu: "배관 상태 정밀 진단 작업", nusu: "청음식 누수탐지 작업" },
+  { file: "work-floor-drain.jpg", hasugu: "화장실 바닥 배수구 막힘 제거", nusu: "욕실 배수 배관 점검 작업" }
+];
+
 const CATEGORY_CONTENT = {
   hasugu: {
     label: "하수",
@@ -321,18 +330,86 @@ function renderAreaDirectoryPage(prefix, areas, currentPage) {
 }
 
 function renderDetailPagination(areas, prefix, areaIndex) {
-  const totalPages = Math.ceil(areas.length / AREA_PAGE_SIZE);
-  const currentPage = Math.floor(areaIndex / AREA_PAGE_SIZE) + 1;
+  const visibleCount = 7;
+  const half = Math.floor(visibleCount / 2);
+  let start = Math.max(0, areaIndex - half);
+  let end = Math.min(areas.length, start + visibleCount);
+  start = Math.max(0, end - visibleCount);
+
+  const previousArea = areaIndex > 0 ? areas[areaIndex - 1] : null;
+  const nextArea = areaIndex < areas.length - 1 ? areas[areaIndex + 1] : null;
+  const visibleAreas = areas.slice(start, end);
+
+  const previous = previousArea
+    ? `<a href="/${prefix}/${previousArea.numericId}/" rel="prev">이전 동</a>`
+    : `<span class="disabled">이전 동</span>`;
+  const next = nextArea
+    ? `<a href="/${prefix}/${nextArea.numericId}/" rel="next">다음 동</a>`
+    : `<span class="disabled">다음 동</span>`;
 
   return `
-    <section aria-label="전체 지역 페이지" style="max-width:1080px;margin:28px auto;padding:24px 20px;border-top:1px solid #e5e7eb">
-      <h2 style="margin:0 0 8px">서울·경기 전체 지역 페이지</h2>
-      <p style="margin:0 0 16px;color:#6b7280">숫자를 누르면 다른 동·읍·면의 지역 목록으로 이동합니다.</p>
-      <div class="pagination">
-        ${renderPagination(prefix, currentPage, totalPages)}
+    <section aria-label="인근 동·읍·면 바로가기" style="max-width:1080px;margin:28px auto;padding:24px 20px;border-top:1px solid #e5e7eb">
+      <h2 style="margin:0 0 8px">다른 지역 바로가기</h2>
+      <p style="margin:0 0 16px;color:#6b7280">버튼을 누르면 지역안내가 아닌 해당 동·읍·면의 실제 상담 페이지로 바로 이동합니다.</p>
+      <nav class="pagination" aria-label="동·읍·면 개별 페이지 이동">
+        ${previous}
+        ${visibleAreas.map((area) => area.numericId === areas[areaIndex].numericId
+          ? `<strong aria-current="page">${escapeHtml(area.dong || getAreaShortName(area))}</strong>`
+          : `<a href="/${prefix}/${area.numericId}/">${escapeHtml(area.dong || getAreaShortName(area))}</a>`
+        ).join("\n")}
+        ${next}
+      </nav>
+    </section>
+  `;
+}
+
+function getOrderedWorkImages(prefix, area) {
+  const offset = Number(BigInt(area.numericId) % BigInt(WORK_IMAGES.length));
+  const ordered = [...WORK_IMAGES.slice(offset), ...WORK_IMAGES.slice(0, offset)];
+  return prefix === "nusu"
+    ? [...ordered].sort((a, b) => Number(b.file === "work-leak-detection.jpg") - Number(a.file === "work-leak-detection.jpg"))
+    : ordered;
+}
+
+function renderWorkGallery(area, prefix) {
+  const areaName = escapeHtml(getAreaShortName(area));
+  const serviceLabel = prefix === "nusu" ? "누수탐지" : "하수구막힘";
+  const images = getOrderedWorkImages(prefix, area);
+
+  return `
+    <section class="work-gallery" aria-labelledby="work-gallery-title" style="max-width:1080px;margin:30px auto;padding:26px 20px;border:1px solid #e5e7eb;border-radius:18px;background:#fff">
+      <h2 id="work-gallery-title" style="margin:0 0 8px">${areaName} ${serviceLabel} 작업사진</h2>
+      <p style="margin:0 0 18px;color:#6b7280">응급배관119의 배관 점검·막힘 제거·누수탐지 작업 이미지입니다.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px">
+        ${images.map((image, index) => {
+          const description = escapeHtml(prefix === "nusu" ? image.nusu : image.hasugu);
+          const loading = index === 0 ? "eager" : "lazy";
+          const priority = index === 0 ? ' fetchpriority="high"' : "";
+          return `<figure style="margin:0">
+            <img src="../../assets/${image.file}" width="1200" height="900" loading="${loading}" decoding="async"${priority}
+              alt="${areaName} ${serviceLabel} ${description}"
+              style="display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;border-radius:12px" />
+            <figcaption style="padding:8px 2px 2px;color:#4b5563;font-size:14px">${areaName} ${description}</figcaption>
+          </figure>`;
+        }).join("\n")}
       </div>
     </section>
   `;
+}
+
+function addWorkImageMeta(html, area, prefix) {
+  const firstImage = getOrderedWorkImages(prefix, area)[0];
+  const imageUrl = `${SITE_INFO.siteUrl}/assets/${firstImage.file}`;
+  const areaName = escapeHtml(getAreaShortName(area));
+  const serviceLabel = prefix === "nusu" ? "누수탐지" : "하수구막힘";
+  const meta = `
+  <meta property="og:image" content="${imageUrl}" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="900" />
+  <meta property="og:image:alt" content="${areaName} ${serviceLabel} 작업사진" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="${imageUrl}" />`;
+  return html.replace("</head>", `${meta}\n</head>`);
 }
 
 function injectBeforeClosingTag(html, block) {
@@ -985,8 +1062,11 @@ function build() {
         continue;
       }
 
-      const html = injectBeforeClosingTag(
-        replaceAllText(template, area, service),
+      let html = replaceAllText(template, area, service);
+      html = addWorkImageMeta(html, area, prefix);
+      html = injectBeforeClosingTag(html, renderWorkGallery(area, prefix));
+      html = injectBeforeClosingTag(
+        html,
         renderDetailPagination(areas, prefix, areaIndex)
       );
       const outDir = path.join(distDir, prefix, area.numericId);
