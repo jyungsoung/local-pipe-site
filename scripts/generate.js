@@ -430,14 +430,49 @@ function renderPromoGallery(area, prefix) {
   const serviceLabel = prefix === "nusu" ? "누수탐지" : "하수구막힘";
 
   return `
-    <section class="promo-gallery" aria-labelledby="promo-gallery-title" style="max-width:1080px;margin:30px auto;padding:26px 20px;border:1px solid #e5e7eb;border-radius:18px;background:#f8fbff">
+    <section class="promo-gallery" aria-labelledby="promo-gallery-title" style="max-width:1080px;margin:30px auto;padding:26px 20px;border:1px solid #e5e7eb;border-radius:18px;background:#f8fbff;overflow:hidden">
+      <style>
+        .promo-gallery .promo-row {
+          display: grid !important;
+          grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+          gap: 8px !important;
+          width: 100% !important;
+          align-items: start !important;
+        }
+        .promo-gallery .promo-item {
+          display: block !important;
+          min-width: 0 !important;
+          margin: 0 !important;
+          padding: 0 !important;
+        }
+        .promo-gallery .promo-item img {
+          display: block !important;
+          width: 100% !important;
+          max-width: none !important;
+          height: auto !important;
+          aspect-ratio: 1 / 1 !important;
+          object-fit: cover !important;
+          border-radius: 8px !important;
+        }
+        @media (max-width: 760px) {
+          .promo-gallery .promo-row {
+            grid-template-columns: repeat(7, 120px) !important;
+            overflow-x: auto !important;
+            overscroll-behavior-inline: contain;
+            scroll-snap-type: x proximity;
+            padding-bottom: 8px !important;
+          }
+          .promo-gallery .promo-item {
+            scroll-snap-align: start;
+          }
+        }
+      </style>
       <h2 id="promo-gallery-title" style="margin:0 0 8px">${areaName} 배관 서비스 안내</h2>
       <p style="margin:0 0 18px;color:#6b7280">응급배관119 대표번호 1668-1321 · 하수구막힘과 누수탐지 상담</p>
-      <div class="promo-grid">
-        ${PROMO_IMAGES.map((image) => `<figure class="promo-card">
-          <img class="promo-thumb" src="../../assets/${image.file}" width="1000" height="1000" loading="lazy" decoding="async"
+      <div class="promo-row">
+        ${PROMO_IMAGES.map((image) => `<figure class="promo-item">
+          <img src="../../assets/${image.file}" width="1000" height="1000" loading="lazy" decoding="async"
             alt="${areaName} ${serviceLabel} ${escapeHtml(image.label)} 응급배관119 1668-1321" />
-          <figcaption>${areaName} ${escapeHtml(image.label)}</figcaption>
         </figure>`).join("\n")}
       </div>
     </section>
