@@ -19,6 +19,30 @@ const SITE_INFO = {
   siteUrl: "https://preeminent-fenglisu-4251ae.netlify.app"
 };
 
+const SERVICE_LABEL_BY_PREFIX = {
+  hasugu: "하수구막힘",
+  "sink-clog": "싱크대막힘",
+  "toilet-clog": "변기막힘",
+  "drain-clog": "배수구막힘",
+  "high-pressure-jetting": "고압세척",
+  "pipe-cleaning": "배관청소",
+  nusu: "누수탐지",
+  "ceiling-leak": "천장누수",
+  "micro-leak": "미세누수",
+  "pipe-leak": "배관누수",
+  "bathroom-leak": "화장실누수",
+  "heating-pipe-leak": "난방배관누수"
+};
+
+const NUSU_PREFIXES = new Set([
+  "nusu",
+  "ceiling-leak",
+  "micro-leak",
+  "pipe-leak",
+  "bathroom-leak",
+  "heating-pipe-leak"
+]);
+
 const WORK_IMAGES = [
   { file: "field-pipe-camera.jpg", hasugu: "배관내시경으로 관 내부를 확인하는 실제 현장", nusu: "배관내시경으로 배관 상태를 확인하는 실제 현장" },
   { file: "field-obstruction.jpg", hasugu: "배관에서 제거한 이물질을 확인하는 실제 현장", nusu: "배관 주변 이상 원인을 확인하는 실제 현장" },
@@ -155,6 +179,23 @@ function normalizePrefix(prefix) {
   return String(prefix || "").replace(/^\/+|\/+$/g, "");
 }
 
+function isNusuPrefix(prefix) {
+  return NUSU_PREFIXES.has(normalizePrefix(prefix));
+}
+
+function getServiceLabel(prefix) {
+  return SERVICE_LABEL_BY_PREFIX[normalizePrefix(prefix)] || "배관 서비스";
+}
+
+function getCategoryContent(prefix) {
+  const family = isNusuPrefix(prefix) ? "nusu" : "hasugu";
+  const baseKeyword = family === "nusu" ? "누수탐지" : "하수구막힘";
+  const serviceLabel = getServiceLabel(prefix);
+  return JSON.parse(
+    JSON.stringify(CATEGORY_CONTENT[family]).replaceAll(baseKeyword, serviceLabel)
+  );
+}
+
 function getNumericAreaId(slug) {
   const digest = crypto.createHash("sha256").update(String(slug)).digest("hex");
   const id = BigInt(`0x${digest.slice(0, 16)}`) % 1000000000000n;
@@ -187,7 +228,11 @@ function replaceCommonText(template) {
 }
 
 function replaceAllText(template, area, service) {
+  const family = service.family || (service.type === "nusu" ? "nusu" : "hasugu");
+  const baseKeyword = family === "nusu" ? "누수탐지" : "하수구막힘";
   return replaceCommonText(template)
+    .replaceAll(baseKeyword, service.name)
+    .replaceAll(`/${family}/`, `/${service.urlPrefix}/`)
     .replaceAll("[시도명]", area.sido)
     .replaceAll("[구명]", area.sigungu)
     .replaceAll("[동명]", area.dong)
@@ -378,8 +423,8 @@ function renderAreaDirectorySection(areas, prefix, label, currentPage) {
 }
 
 function renderAreaDirectoryPage(prefix, areas, currentPage) {
-  const content = CATEGORY_CONTENT[prefix];
-  const label = content.label === "하수" ? "하수구막힘" : "누수탐지";
+  const content = getCategoryContent(prefix);
+  const label = getServiceLabel(prefix);
   const totalPages = Math.ceil(areas.length / AREA_PAGE_SIZE);
 
   if (!content || currentPage < 1 || currentPage > totalPages) {
@@ -444,7 +489,7 @@ function renderDetailPagination(areas, prefix, areaIndex) {
 function getOrderedWorkImages(prefix, area) {
   const offset = Number(BigInt(area.numericId) % BigInt(WORK_IMAGES.length));
   const ordered = [...WORK_IMAGES.slice(offset), ...WORK_IMAGES.slice(0, offset)];
-  return prefix === "nusu"
+  return isNusuPrefix(prefix)
     ? [...ordered].sort((a, b) => Number(b.file === "work-leak-detection.jpg") - Number(a.file === "work-leak-detection.jpg"))
     : ordered;
 }
@@ -455,14 +500,14 @@ function pickVariant(items, area, salt) {
 }
 
 function renderLocalGuide(area, prefix) {
-  const variants = LOCAL_GUIDE_VARIANTS[prefix];
+  const variants = LOCAL_GUIDE_VARIANTS[isNusuPrefix(prefix) ? "nusu" : "hasugu"];
   const areaName = escapeHtml(getAreaShortName(area));
   const focus = escapeHtml(pickVariant(variants.focus, area, "focus"));
   const setting = escapeHtml(pickVariant(variants.setting, area, "setting"));
   const cause = escapeHtml(pickVariant(variants.cause, area, "cause"));
   const check = escapeHtml(pickVariant(variants.check, area, "check"));
   const prevention = escapeHtml(pickVariant(variants.prevention, area, "prevention"));
-  const serviceLabel = prefix === "nusu" ? "누수탐지" : "하수구막힘";
+  const serviceLabel = getServiceLabel(prefix);
 
   return `
     <section class="local-guide" aria-labelledby="local-guide-title" style="max-width:1080px;margin:30px auto;padding:28px 20px;border:1px solid #dbe5f1;border-radius:18px;background:#f8fbff">
@@ -477,7 +522,7 @@ function renderLocalGuide(area, prefix) {
 
 function renderWorkGallery(area, prefix) {
   const areaName = escapeHtml(getAreaShortName(area));
-  const serviceLabel = prefix === "nusu" ? "누수탐지" : "하수구막힘";
+  const serviceLabel = getServiceLabel(prefix);
   const images = getOrderedWorkImages(prefix, area);
 
   return `
@@ -486,7 +531,7 @@ function renderWorkGallery(area, prefix) {
       <p style="margin:0 0 18px;color:#6b7280">응급배관119가 직접 촬영한 실제 배관 점검·막힘 제거 현장 자료입니다. 사진의 촬영지는 현재 보고 계신 지역과 다를 수 있습니다.</p>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px">
         ${images.map((image, index) => {
-          const description = escapeHtml(prefix === "nusu" ? image.nusu : image.hasugu);
+          const description = escapeHtml(isNusuPrefix(prefix) ? image.nusu : image.hasugu);
           const loading = index === 0 ? "eager" : "lazy";
           const priority = index === 0 ? ' fetchpriority="high"' : "";
           return `<figure style="margin:0">
@@ -503,7 +548,7 @@ function renderWorkGallery(area, prefix) {
 
 function renderPromoGallery(area, prefix) {
   const areaName = escapeHtml(getAreaShortName(area));
-  const serviceLabel = prefix === "nusu" ? "누수탐지" : "하수구막힘";
+  const serviceLabel = getServiceLabel(prefix);
 
   return `
     <section class="promo-gallery" aria-labelledby="promo-gallery-title" style="max-width:1080px;margin:30px auto;padding:26px 20px;border:1px solid #e5e7eb;border-radius:18px;background:#f8fbff;overflow:hidden">
@@ -557,7 +602,7 @@ function renderPromoGallery(area, prefix) {
 
 function renderConsultBanner(area, prefix) {
   const areaName = escapeHtml(getAreaShortName(area));
-  const serviceLabel = prefix === "nusu" ? "누수탐지" : "하수구막힘";
+  const serviceLabel = getServiceLabel(prefix);
 
   return `
     <section class="consult-banner" aria-label="${areaName} ${serviceLabel} 응급배관119 상담 안내"
@@ -577,7 +622,7 @@ function addWorkImageMeta(html, area, prefix) {
     (image) => `${SITE_INFO.siteUrl}/assets/${image.file}`
   );
   const areaName = escapeHtml(getAreaShortName(area));
-  const serviceLabel = prefix === "nusu" ? "누수탐지" : "하수구막힘";
+  const serviceLabel = getServiceLabel(prefix);
   const canonicalUrl = `${SITE_INFO.siteUrl}/${prefix}/${area.numericId}/`;
   const imageMeta = imageUrls.map((imageUrl, index) => `
   <meta property="og:image" content="${imageUrl}" />
@@ -1140,7 +1185,7 @@ function renderHomeIndex(areas) {
 }
 
 function renderServiceIndex(prefix, areas) {
-  const content = CATEGORY_CONTENT[prefix];
+  const content = getCategoryContent(prefix);
 
   if (!content) {
     throw new Error(`대표 페이지 콘텐츠가 없습니다: ${prefix}`);
@@ -1275,7 +1320,7 @@ function makeRedirects(areas, services) {
 }
 
 function validateLocalSeo(html, area, prefix) {
-  const serviceLabel = prefix === "nusu" ? "누수탐지" : "하수구막힘";
+  const serviceLabel = getServiceLabel(prefix);
   const areaName = getAreaShortName(area);
 
   const extract = (pattern) => html.match(pattern)?.[1] || "";
@@ -1299,10 +1344,10 @@ function validateLocalSeo(html, area, prefix) {
       new RegExp(`alt=["']${areaName} ${serviceLabel} [^"']+["']`).test(html)
     ],
     [
-      "서비스 내부링크",
-      new RegExp(
-        `href=["']/${prefix}/${area.numericId}/["'][^>]*>\\s*${area.dong} ${serviceLabel}`
-      ).test(html)
+      "canonical",
+      html.includes(
+        `<link rel="canonical" href="${SITE_INFO.siteUrl}/${prefix}/${area.numericId}/"`
+      )
     ]
   ];
 
@@ -1316,7 +1361,12 @@ function validateLocalSeo(html, area, prefix) {
 }
 
 function build() {
-  fs.rmSync(distDir, { recursive: true, force: true });
+  fs.rmSync(distDir, {
+    recursive: true,
+    force: true,
+    maxRetries: 5,
+    retryDelay: 100
+  });
   ensureDir(distDir);
 
   const areas = readCsv(areasCsvPath).map((area) => ({
@@ -1356,31 +1406,29 @@ function build() {
   for (const service of services) {
     const prefix = normalizePrefix(service.urlPrefix);
 
-    if (CATEGORY_CONTENT[prefix]) {
-      const serviceDir = path.join(distDir, prefix);
-      ensureDir(serviceDir);
+    const serviceDir = path.join(distDir, prefix);
+    ensureDir(serviceDir);
 
+    fs.writeFileSync(
+      path.join(serviceDir, "index.html"),
+      renderServiceIndex(prefix, areas),
+      "utf8"
+    );
+
+    sitemapUrls.push(`${SITE_INFO.siteUrl}/${prefix}/`);
+
+    const totalDirectoryPages = Math.ceil(areas.length / AREA_PAGE_SIZE);
+    for (let page = 1; page <= totalDirectoryPages; page += 1) {
+      const directoryDir = path.join(serviceDir, "regions", String(page));
+      ensureDir(directoryDir);
       fs.writeFileSync(
-        path.join(serviceDir, "index.html"),
-        renderServiceIndex(prefix, areas),
+        path.join(directoryDir, "index.html"),
+        renderAreaDirectoryPage(prefix, areas, page),
         "utf8"
       );
-
-      sitemapUrls.push(`${SITE_INFO.siteUrl}/${prefix}/`);
-
-      const totalDirectoryPages = Math.ceil(areas.length / AREA_PAGE_SIZE);
-      for (let page = 1; page <= totalDirectoryPages; page += 1) {
-        const directoryDir = path.join(serviceDir, "regions", String(page));
-        ensureDir(directoryDir);
-        fs.writeFileSync(
-          path.join(directoryDir, "index.html"),
-          renderAreaDirectoryPage(prefix, areas, page),
-          "utf8"
-        );
-        sitemapUrls.push(
-          `${SITE_INFO.siteUrl}${getAreaDirectoryPath(prefix, page)}`
-        );
-      }
+      sitemapUrls.push(
+        `${SITE_INFO.siteUrl}${getAreaDirectoryPath(prefix, page)}`
+      );
     }
   }
 
