@@ -1307,6 +1307,7 @@ Sitemap: ${SITE_INFO.siteUrl}/sitemap.xml
 
 function makeRedirects(areas, services) {
   return services
+    .filter((service) => service.urlPrefix === "hasugu" || service.urlPrefix === "nusu")
     .flatMap((service) => {
       const prefix = normalizePrefix(service.urlPrefix);
 
