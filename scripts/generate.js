@@ -572,17 +572,18 @@ function renderConsultBanner(area, prefix) {
 }
 
 function addWorkImageMeta(html, area, prefix) {
-  const imageUrls = getOrderedWorkImages(prefix, area)
-    .slice(0, 5)
-    .map((image) => `${SITE_INFO.siteUrl}/assets/${image.file}`);
+  const searchImages = PROMO_IMAGES.slice(0, 5);
+  const imageUrls = searchImages.map(
+    (image) => `${SITE_INFO.siteUrl}/assets/${image.file}`
+  );
   const areaName = escapeHtml(getAreaShortName(area));
   const serviceLabel = prefix === "nusu" ? "누수탐지" : "하수구막힘";
   const canonicalUrl = `${SITE_INFO.siteUrl}/${prefix}/${area.numericId}/`;
   const imageMeta = imageUrls.map((imageUrl, index) => `
   <meta property="og:image" content="${imageUrl}" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="900" />
-  <meta property="og:image:alt" content="${areaName} ${serviceLabel} 작업사진 ${index + 1}" />`).join("");
+  <meta property="og:image:width" content="1000" />
+  <meta property="og:image:height" content="1000" />
+  <meta property="og:image:alt" content="${areaName} ${serviceLabel} ${escapeHtml(searchImages[index].label)} 서비스 안내" />`).join("");
   const structuredData = JSON.stringify({
     "@context": "https://schema.org",
     "@type": "WebPage",
@@ -596,7 +597,7 @@ function addWorkImageMeta(html, area, prefix) {
     associatedMedia: imageUrls.map((contentUrl, index) => ({
       "@type": "ImageObject",
       contentUrl,
-      caption: `${getAreaShortName(area)} ${serviceLabel} 작업 참고사진 ${index + 1}`
+      caption: `${getAreaShortName(area)} ${serviceLabel} ${searchImages[index].label} 서비스 안내`
     }))
   }).replaceAll("<", "\\u003c");
   const meta = `
@@ -1402,9 +1403,9 @@ function build() {
       let html = replaceAllText(template, area, service);
       html = addWorkImageMeta(html, area, prefix);
       html = injectAfterRequestForm(html, renderConsultBanner(area, prefix));
-      html = injectAfterRequestForm(html, renderWorkGallery(area, prefix));
+      html = injectAfterRequestForm(html, renderPromoGallery(area, prefix));
       html = injectBeforeClosingTag(html, renderLocalGuide(area, prefix));
-      html = injectBeforeClosingTag(html, renderPromoGallery(area, prefix));
+      html = injectBeforeClosingTag(html, renderWorkGallery(area, prefix));
       html = injectBeforeClosingTag(
         html,
         renderDetailPagination(areas, prefix, areaIndex)
