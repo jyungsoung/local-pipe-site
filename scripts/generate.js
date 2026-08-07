@@ -572,17 +572,38 @@ function renderConsultBanner(area, prefix) {
 }
 
 function addWorkImageMeta(html, area, prefix) {
-  const firstImage = getOrderedWorkImages(prefix, area)[0];
-  const imageUrl = `${SITE_INFO.siteUrl}/assets/${firstImage.file}`;
+  const imageUrls = getOrderedWorkImages(prefix, area)
+    .slice(0, 5)
+    .map((image) => `${SITE_INFO.siteUrl}/assets/${image.file}`);
   const areaName = escapeHtml(getAreaShortName(area));
   const serviceLabel = prefix === "nusu" ? "누수탐지" : "하수구막힘";
-  const meta = `
+  const canonicalUrl = `${SITE_INFO.siteUrl}/${prefix}/${area.numericId}/`;
+  const imageMeta = imageUrls.map((imageUrl, index) => `
   <meta property="og:image" content="${imageUrl}" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="900" />
-  <meta property="og:image:alt" content="${areaName} ${serviceLabel} 작업사진" />
+  <meta property="og:image:alt" content="${areaName} ${serviceLabel} 작업사진 ${index + 1}" />`).join("");
+  const structuredData = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: `${getAreaShortName(area)} ${serviceLabel} 상담 안내`,
+    url: canonicalUrl,
+    primaryImageOfPage: {
+      "@type": "ImageObject",
+      contentUrl: imageUrls[0]
+    },
+    image: imageUrls,
+    associatedMedia: imageUrls.map((contentUrl, index) => ({
+      "@type": "ImageObject",
+      contentUrl,
+      caption: `${getAreaShortName(area)} ${serviceLabel} 작업 참고사진 ${index + 1}`
+    }))
+  }).replaceAll("<", "\\u003c");
+  const meta = `
+  ${imageMeta}
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:image" content="${imageUrl}" />`;
+  <meta name="twitter:image" content="${imageUrls[0]}" />
+  <script type="application/ld+json">${structuredData}</script>`;
   return html.replace("</head>", `${meta}\n</head>`);
 }
 
@@ -1381,8 +1402,8 @@ function build() {
       let html = replaceAllText(template, area, service);
       html = addWorkImageMeta(html, area, prefix);
       html = injectAfterRequestForm(html, renderConsultBanner(area, prefix));
+      html = injectAfterRequestForm(html, renderWorkGallery(area, prefix));
       html = injectBeforeClosingTag(html, renderLocalGuide(area, prefix));
-      html = injectBeforeClosingTag(html, renderWorkGallery(area, prefix));
       html = injectBeforeClosingTag(html, renderPromoGallery(area, prefix));
       html = injectBeforeClosingTag(
         html,
