@@ -1244,7 +1244,8 @@ function makeRedirects(areas, services) {
       const prefix = normalizePrefix(service.urlPrefix);
 
       return areas.map(
-        (area) => `/${prefix}/${area.slug}/  /${prefix}/${area.numericId}/  301!`
+        (area) =>
+          `${encodeURI(`/${prefix}/${area.slug}/`)}  /${prefix}/${area.numericId}/  301!`
       );
     })
     .join("\n")
